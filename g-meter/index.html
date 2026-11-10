@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>G-Force Recorder</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--soft:#19263a;--text:#e8eef8;--muted:#9aabc2;--grid:#2b3b52;--border:#293a52;--accent:#72bdff;--x:#ff777e;--y:#54d6a0;--z:#78aaff;--mag:#f4bd65}
+:root.light{color-scheme:light;--bg:#f2f5f9;--panel:#fff;--soft:#edf2f8;--text:#172235;--muted:#617087;--grid:#d9e1eb;--border:#d6dfeb;--accent:#087dcc;--x:#d83e48;--y:#168b59;--z:#286bd1;--mag:#b87308}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header,main,footer{max-width:900px;margin:auto;padding-left:16px;padding-right:16px}
+header{padding-top:20px;padding-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:1.55rem;letter-spacing:-.035em;margin:0}.subtitle{color:var(--muted);font-size:.86rem;margin-top:2px}
+main{display:grid;gap:12px;padding-bottom:24px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:14px;min-width:0}
+button,select,input[type=text]{font:inherit;color:var(--text);background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:9px 12px}
+button{font-weight:650;cursor:pointer}button.primary{background:var(--accent);color:#071421;border-color:transparent}button:disabled{opacity:.4;cursor:not-allowed}
+input[type=text]{width:9.5em;font-weight:400}
+button:focus-visible,select:focus-visible,input[type=text]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{margin-left:auto;color:var(--muted);font-size:.85rem;display:flex;align-items:center;gap:7px}.dot{height:8px;width:8px;border-radius:50%;background:#8392a6}.dot.live{background:#30d68a}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.metric{background:var(--soft);border-radius:11px;padding:11px;min-width:0}.metric label{display:block;color:var(--muted);font-size:.76rem}.value{font-size:clamp(1.35rem,4vw,1.9rem);font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{color:var(--muted);font-size:.78rem;margin-left:4px}.x .value{color:var(--x)}.y .value{color:var(--y)}.z .value{color:var(--z)}.mag .value{color:var(--mag)}
+.chart-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.chart-title h2,.panel h2{font-size:.98rem;margin:0}.legend{display:flex;gap:11px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}.key{display:flex;align-items:center;gap:5px}.swatch{width:8px;height:8px;border-radius:2px}
+canvas{display:block;width:100%;height:220px}.magnitude canvas{height:150px}.hint{color:var(--muted);font-size:.78rem;margin-top:7px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:var(--soft);border-radius:10px;padding:10px}.stat b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}.stat span{font-size:.76rem;color:var(--muted)}
+.options{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}.options label{font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:7px}.options input{accent-color:var(--accent)}
+#message{font-size:.82rem;color:var(--muted);margin-top:9px;min-height:1.2em}#message.error{color:#ff777e}
+.marker-list{color:var(--muted);font-size:.82rem;line-height:1.8;overflow-wrap:anywhere}
+footer{padding-bottom:26px;color:var(--muted);font-size:.77rem}
+@media(max-width:600px){header{padding-top:15px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.status{width:100%;margin-left:0}.stats{grid-template-columns:repeat(3,1fr)}canvas{height:190px}}
+</style>
+</head>
+<body>
+<header>
+ <div><h1>G-Force Recorder</h1><div class="subtitle">Minimal motion telemetry · live 3-axis acceleration</div></div>
+ <button id="theme" aria-label="Toggle theme">☀ / ☾</button>
+</header>
+<main>
+ <section class="panel">
+  <div class="toolbar">
+   <button class="primary" id="enable">Enable sensor</button>
+   <button id="record" disabled>Start recording</button>
+   <button id="pause" disabled>Pause</button>
+   <input type="text" id="markLabel" placeholder="Event label" aria-label="Label for the next event marker" maxlength="60">
+   <button id="mark" disabled>Mark event</button>
+   <button id="export" disabled>Export CSV</button>
+   <button id="reset">Reset</button>
+   <span class="status"><i class="dot" id="dot"></i><span id="status">Sensor off</span></span>
+  </div>
+  <div id="message" role="status">Open on a motion-sensor-equipped phone over HTTPS (not file://), directly in Safari or Chrome. Tap Enable sensor and allow access.</div>
+ </section>
+
+ <section class="metrics">
+  <div class="metric x"><label id="xLabel">X axis</label><span class="value" id="x">—</span><span class="unit">g</span></div>
+  <div class="metric y"><label id="yLabel">Y axis</label><span class="value" id="y">—</span><span class="unit">g</span></div>
+  <div class="metric z"><label id="zLabel">Z axis</label><span class="value" id="z">—</span><span class="unit">g</span></div>
+  <div class="metric mag"><label>Resultant magnitude</label><span class="value" id="mag">—</span><span class="unit">g</span></div>
+ </section>
+
+ <section class="panel">
+  <div class="chart-title"><h2>Acceleration history</h2><div class="legend">
+   <span class="key"><i class="swatch" style="background:var(--x)"></i>X</span>
+   <span class="key"><i class="swatch" style="background:var(--y)"></i>Y</span>
+   <span class="key"><i class="swatch" style="background:var(--z)"></i>Z</span>
+  </div></div>
+  <canvas id="axesChart" aria-label="X, Y and Z acceleration over time"></canvas>
+  <div class="hint">Three axes share one scale. The graph scrolls continuously.</div>
+ </section>
+
+ <section class="panel magnitude">
+  <div class="chart-title"><h2>Resultant G</h2><span class="hint">√(X² + Y² + Z²)</span></div>
+  <canvas id="magChart" aria-label="Resultant acceleration magnitude over time"></canvas>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:10px">Session</h2>
+  <div class="stats">
+   <div class="stat"><b id="duration">00:00.0</b><span>Recording time</span></div>
+   <div class="stat"><b id="peak">—</b><span>Peak resultant G</span></div>
+   <div class="stat"><b id="rate">—</b><span>Sample rate (Hz)</span></div>
+  </div>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:10px">Setup</h2>
+  <div class="options">
+   <label>Profile <select id="profile"><option value="road">Road</option><option value="flight">Flight</option></select></label>
+   <label>Graph window <select id="window"><option value="10">10 s</option><option value="20" selected>20 s</option><option value="30">30 s</option><option value="60">60 s</option></select></label>
+   <label>Scale <select id="scale"><option value="2">±2 g</option><option value="4" selected>±4 g</option><option value="8">±8 g</option><option value="16">±16 g</option></select></label>
+   <label><input type="checkbox" id="linear"> Gravity-compensated acceleration</label>
+  </div>
+  <div class="hint" id="profileHint">Road profile: orient and secure the phone consistently. X/Y/Z are device axes until you align the phone with the vehicle.</div>
+  <div class="hint">Specific force (default) includes gravity: a stationary, level phone reads about 1 g in the gravity-aligned direction. Linear acceleration attempts to remove gravity. If the selected signal is unavailable, the recorder uses the available fallback and labels it in the CSV. Browser/device sensor capabilities vary.</div>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:6px">Event markers</h2>
+  <div class="marker-list" id="markers">No events marked.</div>
+ </section>
+</main>
+<footer>Not certified instrumentation. Do not use for flight operations, vehicle safety decisions, or other safety-critical purposes. Phone sensors are orientation-dependent, can saturate, and may have limited bandwidth.</footer>
+<script>
+(()=>{
+ const $=id=>document.getElementById(id), g0=9.80665;
+ const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const LIVE_KEEP_MS=65000;
+ let evCount=0,evNull=0,finalElapsed=0,enabled=false,recording=false,paused=false,latest=null;
+ let live=[],samples=[],markers=[],start=0,pauseAt=0,pausedMs=0,lastSensorTime=null,intervals=[],peakMagnitude=0;
+ let sensorLive=false,dmAlive=false,probeTimer=null,genErrors=[],hiddenDuringRecording=false;
+ const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.toggle('error',err)};
+ const status=(s,on)=>{$('status').textContent=s;$('dot').classList.toggle('live',!!on)};
+ const nfmt=v=>Number.isFinite(v)?v.toFixed(3):'—';
+ const elapsed=()=>recording?Math.max(0,((paused?pauseAt:performance.now())-start-pausedMs)/1000):finalElapsed;
+ const timefmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+(s%60).toFixed(1).padStart(4,'0');
+ const ok=o=>!!o&&[o.x,o.y,o.z].every(v=>typeof v==='number'&&Number.isFinite(v));
+
+ function updateStats(){
+  $('duration').textContent=timefmt(elapsed());
+  $('peak').textContent=samples.length?nfmt(peakMagnitude):'—';
+  if(intervals.length){const avg=intervals.reduce((a,b)=>a+b,0)/intervals.length;$('rate').textContent=(1000/avg).toFixed(1)}else $('rate').textContent='—';
+ }
+
+ // Shared path for every sensor source. inclG / lin are {x,y,z} in m/s².
+ function ingest(inclG,lin,via){
+  const useLinear=$('linear').checked;
+  let a=useLinear?lin:inclG;
+  let source=useLinear?'linear acceleration':'specific force (gravity-inclusive)';
+  if(!ok(a)){a=useLinear?inclG:lin;source=useLinear?'specific force fallback':'linear acceleration fallback'}
+  evCount++;
+  if(!ok(a)){evNull++;return false}
+  const t=performance.now(),[... ELLIPSIZATION ...]t... 
+</script>
+</body>
+</html>
