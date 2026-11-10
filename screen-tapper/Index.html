@@ -1,1 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10151d">
+<title>Tap Interval Instrument</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0d1219;
+    --panel: rgba(23, 31, 42, .96);
+    --panel-border: #2b3747;
+    --text: #edf3fa;
+    --muted: #9aa9ba;
+    --accent: #69d6c2;
+    --accent-soft: rgba(105,214,194,.13);
+    --surface: #141d28;
+    --row: rgba(255,255,255,.035);
+    --shadow: 0 14px 42px rgba(0,0,0,.28);
+  }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #eaf0f5;
+    --panel: rgba(255,255,255,.97);
+    --panel-border: #d4dee8;
+    --text: #172333;
+    --muted: #627286;
+    --accent: #087f70;
+    --accent-soft: rgba(8,127,112,.10);
+    --surface: #f4f8fb;
+    --row: rgba(15,35,55,.045);
+    --shadow: 0 14px 42px rgba(31,55,78,.13);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe 
+UI", sans-serif;
+    -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation;
+    transition: background .2s, color .2s;
+  }
+  #tapField {
+    position: fixed; inset: 0; display: grid; place-items: center;
+    cursor: crosshair; outline: none; touch-action: manipulation;
+  }
+  .tap-hint { text-align: center; pointer-events: none; padding: 24px; }
+  .pulse {
+    width: 104px; height: 104px; border-radius: 50%;
+    border: 1px solid var(--accent); background: var(--accent-soft);
+    display: grid; place-items: center; margin: 0 auto 18px;
+    box-shadow: 0 0 0 12px var(--accent-soft), 0 0 42px var(--accent-soft);
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .pulse span { font-size: 34px; color: var(--accent); }
+  #tapField.pressed .pulse { transform: scale(.91); 
+box-shadow: 0 0 0 5px var(--accent-soft); }
+  .hint-title { font-size: clamp(19px, 3vw, 25px); font-weight: 650; letter-spacing: .01em; }
+  .hint-sub { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .dashboard {
+    position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top)); left: 50%;
+    transform: translateX(-50%); width: min(760px, calc(100% - 24px));
+    max-height: min(47vh, 430px); 
+overflow: auto;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 18px; box-shadow: var(--shadow); padding: 14px;
+    backdrop-filter: blur(14px); scrollbar-width: thin;
+  }
+  .topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .brand-mark { width: 27px; height: 27px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 800; }
+  h1 { font-size: 14px; margin: 0; letter-spacing: .02em; }
+  .status { color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .actions { display: flex; gap: 7px; }
+  button {
+    border: 1px solid var(--panel-border); background: var(--surface); color: var(--text);
+    border-radius: 9px; padding: 8px 10px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  button:active { transform: translateY(1px); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #071713; font-weight: 700; }
+  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+  .metric { background: var(--surface); border: 1px solid var(--panel-border); border-radius: 11px; padding: 9px 10px; min-width: 0; }
+  .metric .label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .075em; }
+  .metric .value { font-size: clamp(17px, 3vw, 23px); font-variant-numeric: tabular-nums; font-weight: 650; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .metric .unit { color: var(--muted); font-size: 10px; font-weight: 500; }
+  .lower { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .subpanel { background: 
+var(--surface); border: 1px solid var(--panel-border); border-radius: 11px; padding: 10px; min-width: 0; }
+  .subhead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+  .subhead strong { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+  .subhead span { color: var(--muted); font-size: 10px; }
+  #latest { font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  #latest small { color: 
+var(--muted); font-size: 11px; font-weight: 500; }
+  .history { display: flex; gap: 5px; flex-wrap: wrap; max-height: 48px; overflow: hidden; }
+  .chip { font-size: 10px; font-variant-numeric: tabular-nums; color: var(--muted); background: var(--row); border-radius: 5px; padding: 4px 6px; }
+  .foot { color: var(--muted); font-size: 10px; text-align: center; margin-top: 9px; }
+  @media (max-width: 520px) {
+    .dashboard { max-height: 54vh; padding: 11px; 
+border-radius: 15px; }
+    .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+    .metric { padding: 8px 9px; }
+    .metric .value { font-size: 19px; }
+    .lower { grid-template-columns: 1fr; gap: 6px; }
+    .subpanel { padding: 8px 9px; }
+    .history { max-height: 40px; }
+    .pulse { width: 82px; height: 82px; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+  <main id="tapField" role="button" tabindex="0" aria-label="Tap anywhere in this area to record a tap">
+    <div class="tap-hint">
+      <div class="pulse"><span>＋</span></div>
+      <div class="hint-title">Tap anywhere to measure</div>
+      <div class="hint-sub">The first tap starts the measurement · Every tap after that records an interval</div>
+    </div>
+  </main>
 
+  <section class="dashboard" aria-label="Tap statistics" id="dashboard">
+    <div class="topline">
+      <div class="brand">
+        <div class="brand-mark">Δt</div>
+        <div>
+          <h1>TAP INTERVAL INSTRUMENT</h1>
+          <div class="status" id="status">Awaiting first tap</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="themeBtn" type="button" aria-label="Toggle 
+light and dark theme">☀ Light</button>
+        <button id="resetBtn" class="primary" type="button">Reset</button>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="label">Total taps</div><div class="value" id="count">0</div></div>
+      <div class="metric"><div class="label">Average interval</div><div class="value" id="mean">— <span class="unit">ms</span></div></
+div>
+      <div class="metric"><div class="label">Median interval</div><div class="value" id="median">— <span class="unit">ms</span></div></div>
+      <div class="metric"><div class="label">Tap rate</div><div class="value" id="hz">— <span class="unit">Hz</span></div></div>
+      <div class="metric"><div class="label">Minimum interval</div><div class="value" id="min">— <span class="unit">ms</span></div></div>
+      <div class="metric"><div class="label">Maximum interval</div><div class="value" id="max">— <span class="unit">ms</span></div></div>
+      <div class="metric"><div class="label">Std. deviation</div><div class="value" id="sd">— <span class="unit">ms</span></div></div>
+      <div class="metric"><div class="label">Intervals recorded</div><div class="value" id="intervalCount">0</div></div>
+    </div>
+
+    <div class="lower">
+      <div class="subpanel">
+        <div class="subhead"><strong>Latest interval</strong><span>Previous tap → current tap</span></div>
+        <div id="latest">— <small>ms</small></div>
+      </div>
+      <div class="subpanel">
+        <div class="subhead"><strong>Recent intervals</strong><span>Newest first · last 12</span></div>
+        <div class="history" id="history"><span 
+class="chip">No intervals yet</span></div>
+      </div>
+    </div>
+    <div class="foot">Timing uses the high-resolution performance clock · Standard deviation is population σ</div>
+  </section>
+
+<script>
+(() => {
+  const field = document.getElementById('tapField');
+  const $ = id => document.getElementById(id);
+  let lastTap = null;
+  let taps = 0;
+  let intervals = [];
+
+  const fmt = n => Number.isFinite(n) ? n.toFixed(2) : '—';
+  const medianOf = values => {
+    if (!values.length) return NaN;
+    const s = [...values].sort((a,b) => a-b);
+    const m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+  };
+  const setMetric = (id, value, unit='ms') => {
+    $(id).innerHTML = `${value} <span class="unit">${unit}</
+span>`;
+  };
+
+  function render() {
+    $('count').textContent = taps;
+    $('intervalCount').textContent = intervals.length;
+    if (!intervals.length) {
+      ['mean','median','min','max','sd','hz'].forEach(id => setMetric(id, '—', id === 'hz' ? 'Hz' : 'ms'));
+      $('latest').innerHTML = '— <small>ms</small>';
+      $('history').innerHTML = '<span class="chip">No intervals yet</span>';
+      return;
+    }
+    const n = intervals.length;
+    const mean = intervals.reduce((a,b) => a+b, 0) / n;
+    const variance = intervals.reduce((a,b) => a + (b-mean)**2, 0) / n;
+    setMetric('mean', fmt(mean));
+    setMetric('median', fmt(medianOf(intervals)));
+    setMetric('min', fmt(Math.min(...intervals)));
+    setMetric('max', fmt(Math.max(...intervals)));
+    setMetric('sd', fmt(Math.sqrt(variance)));
+    setMetric('hz', fmt(1000 / 
+mean), 'Hz');
+    $('latest').innerHTML = `${fmt(intervals[ n - 1 ])} <small>ms</small>`;
+    $('history').innerHTML = intervals.slice(-12).reverse().map(v => `<span class="chip">${fmt(v)} ms</span>`).join('');
+  }
+
+  function tap() {
+    const now = performance.now();
+    taps += 1;
+    if (lastTap !== null) intervals.push(now - lastTap);
+    lastTap = now;
+    $('status').textContent = 
+`Measuring · ${taps} tap${taps === 1 ? '' : 's'} recorded`;
+    render();
+    field.classList.add('pressed');
+    window.setTimeout(() => field.classList.remove('pressed'), 85);
+  }
+
+  field.addEventListener('pointerdown', event => {
+    if (event.button !== undefined && event.button !== 0) return;
+    tap();
+  });
+  field.addEventListener('keydown', event => 
+{
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      tap();
+    }
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    taps = 0; intervals = []; lastTap = null;
+    $('status').textContent = 'Reset · awaiting first tap';
+    render();
+  });
+
+  $('themeBtn').addEventListener('click', () => {
+    const light = document.body.dataset.theme !== 'light';
+    document.body.dataset.theme = light ? 'light' : 'dark';
+    $('themeBtn').textContent = light ? '☾ Dark' : '☀ Light';
+    document.querySelector('meta[name="theme-color"]').content = light ? '#eaf0f5' : '#10151d';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
