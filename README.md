@@ -5,6 +5,7 @@
     <ul>
         <li><a href="./g-meter/">🚀 G-Force Recorder</a></li>
         <li><a href="./screen-tapper/">⏱️ Tap Interval Instrument</a></li>
+        <li><a href="./sound-spectrum-analyzer/">🔊 Sound Spectrum Analyzer</a></li>
     </ul>
 </body>
 </html>
