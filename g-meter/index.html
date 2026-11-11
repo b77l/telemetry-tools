@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>G-Force Recorder</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--soft:#19263a;--text:#e8eef8;--muted:#9aabc2;--grid:#2b3b52;--border:#293a52;--accent:#72bdff;--x:#ff777e;--y:#54d6a0;--z:#78aaff;--mag:#f4bd65}
+:root.light{color-scheme:light;--bg:#f2f5f9;--panel:#fff;--soft:#edf2f8;--text:#172235;--muted:#617087;--grid:#d9e1eb;--border:#d6dfeb;--accent:#087dcc;--x:#d83e48;--y:#168b59;--z:#286bd1;--mag:#b87308}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header,main,footer{max-width:900px;margin:auto;padding-left:16px;padding-right:16px}
+header{padding-top:20px;padding-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:1.55rem;letter-spacing:-.035em;margin:0}.subtitle{color:var(--muted);font-size:.86rem;margin-top:2px}
+main{display:grid;gap:12px;padding-bottom:24px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:14px;min-width:0}
+button,select,input[type=text]{font:inherit;color:var(--text);background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:9px 12px}
+button{font-weight:650;cursor:pointer}button.primary{background:var(--accent);color:#071421;border-color:transparent}button:disabled{opacity:.4;cursor:not-allowed}
+input[type=text]{width:9.5em;font-weight:400}
+button:focus-visible,select:focus-visible,input[type=text]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{margin-left:auto;color:var(--muted);font-size:.85rem;display:flex;align-items:center;gap:7px}.dot{height:8px;width:8px;border-radius:50%;background:#8392a6}.dot.live{background:#30d68a}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.metric{background:var(--soft);border-radius:11px;padding:11px;min-width:0}.metric label{display:block;color:var(--muted);font-size:.76rem}.value{font-size:clamp(1.35rem,4vw,1.9rem);font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{color:var(--muted);font-size:.78rem;margin-left:4px}.x .value{color:var(--x)}.y .value{color:var(--y)}.z .value{color:var(--z)}.mag .value{color:var(--mag)}
+.chart-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.chart-title h2,.panel h2{font-size:.98rem;margin:0}.legend{display:flex;gap:11px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}.key{display:flex;align-items:center;gap:5px}.swatch{width:8px;height:8px;border-radius:2px}
+canvas{display:block;width:100%;height:220px}.magnitude canvas{height:150px}.hint{color:var(--muted);font-size:.78rem;margin-top:7px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:var(--soft);border-radius:10px;padding:10px}.stat b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}.stat span{font-size:.76rem;color:var(--muted)}
+.options{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}.options label{font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:7px}.options input{accent-color:var(--accent)}
+#message{font-size:.82rem;color:var(--muted);margin-top:9px;min-height:1.2em}#message.error{color:#ff777e}
+.marker-list{color:var(--muted);font-size:.82rem;line-height:1.8;overflow-wrap:anywhere}
+footer{padding-bottom:26px;color:var(--muted);font-size:.77rem}
+@media(max-width:600px){header{padding-top:15px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.status{width:100%;margin-left:0}.stats{grid-template-columns:repeat(3,1fr)}canvas{height:190px}}
+</style>
+</head>
+<body>
+<header>
+ <div><h1>G-Force Recorder</h1><div class="subtitle">Minimal motion telemetry · live 3-axis acceleration</div></div>
+ <button id="theme" aria-label="Toggle theme">☀ / ☾</button>
+</header>
+<main>
+ <section class="panel">
+  <div class="toolbar">
+   <button class="primary" id="enable">Enable sensor</button>
+   <button id="record" disabled>Start recording</button>
+   <button id="pause" disabled>Pause</button>
+   <input type="text" id="markLabel" placeholder="Event label" aria-label="Label for the next event marker" maxlength="60">
+   <button id="mark" disabled>Mark event</button>
+   <button id="export" disabled>Export CSV</button>
+   <button id="reset">Reset</button>
+   <span class="status"><i class="dot" id="dot"></i><span id="status">Sensor off</span></span>
+  </div>
+  <div id="message" role="status">Open on a motion-sensor-equipped phone over HTTPS (not file://), directly in Safari or Chrome. Tap Enable sensor and allow access.</div>
+ </section>
+
+ <section class="metrics">
+  <div class="metric x"><label id="xLabel">X axis</label><span class="value" id="x">—</span><span class="unit">g</span></div>
+  <div class="metric y"><label id="yLabel">Y axis</label><span class="value" id="y">—</span><span class="unit">g</span></div>
+  <div class="metric z"><label id="zLabel">Z axis</label><span class="value" id="z">—</span><span class="unit">g</span></div>
+  <div class="metric mag"><label>Resultant magnitude</label><span class="value" id="mag">—</span><span class="unit">g</span></div>
+ </section>
+
+ <section class="panel">
+  <div class="chart-title"><h2>Acceleration history</h2><div class="legend">
+   <span class="key"><i class="swatch" style="background:var(--x)"></i>X</span>
+   <span class="key"><i class="swatch" style="background:var(--y)"></i>Y</span>
+   <span class="key"><i class="swatch" style="background:var(--z)"></i>Z</span>
+  </div></div>
+  <canvas id="axesChart" aria-label="X, Y and Z acceleration over time"></canvas>
+  <div class="hint">Three axes share one scale. The graph scrolls continuously.</div>
+ </section>
+
+ <section class="panel magnitude">
+  <div class="chart-title"><h2>Resultant G</h2><span class="hint">√(X² + Y² + Z²)</span></div>
+  <canvas id="magChart" aria-label="Resultant acceleration magnitude over time"></canvas>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:10px">Session</h2>
+  <div class="stats">
+   <div class="stat"><b id="duration">00:00.0</b><span>Recording time</span></div>
+   <div class="stat"><b id="peak">—</b><span>Peak resultant G</span></div>
+   <div class="stat"><b id="rate">—</b><span>Sample rate (Hz)</span></div>
+  </div>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:10px">Setup</h2>
+  <div class="options">
+   <label>Profile <select id="profile"><option value="road">Road</option><option value="flight">Flight</option></select></label>
+   <label>Graph window <select id="window"><option value="10">10 s</option><option value="20" selected>20 s</option><option value="30">30 s</option><option value="60">60 s</option></select></label>
+   <label>Scale <select id="scale"><option value="2">±2 g</option><option value="4" selected>±4 g</option><option value="8">±8 g</option><option value="16">±16 g</option></select></label>
+   <label><input type="checkbox" id="linear"> Gravity-compensated acceleration</label>
+  </div>
+  <div class="hint" id="profileHint">Road profile: orient and secure the phone consistently. X/Y/Z are device axes until you align the phone with the vehicle.</div>
+  <div class="hint">Specific force (default) includes gravity: a stationary, level phone reads about 1 g in the gravity-aligned direction. Linear acceleration attempts to remove gravity. If the selected signal is unavailable, the recorder uses the available fallback and labels it in the CSV. Browser/device sensor capabilities vary.</div>
+ </section>
+
+ <section class="panel">
+  <h2 style="margin-bottom:6px">Event markers</h2>
+  <div class="marker-list" id="markers">No events marked.</div>
+ </section>
+</main>
+<footer>Not certified instrumentation. Do not use for flight operations, vehicle safety decisions, or other safety-critical purposes. Phone sensors are orientation-dependent, can saturate, and may have limited bandwidth.</footer>
+<script>
+(()=>{
+ const $=id=>document.getElementById(id), g0=9.80665;
+ const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const LIVE_KEEP_MS=65000;
+ let evCount=0,evNull=0,finalElapsed=0,enabled=false,recording=false,paused=false,latest=null;
+ let live=[],samples=[],markers=[],start=0,pauseAt=0,pausedMs=0,lastSensorTime=null,intervals=[],peakMagnitude=0;
+ let sensorLive=false,dmAlive=false,probeTimer=null,genErrors=[],hiddenDuringRecording=false;
+ const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.toggle('error',err)};
+ const status=(s,on)=>{$('status').textContent=s;$('dot').classList.toggle('live',!!on)};
+ const nfmt=v=>Number.isFinite(v)?v.toFixed(3):'—';
+ const elapsed=()=>recording?Math.max(0,((paused?pauseAt:performance.now())-start-pausedMs)/1000):finalElapsed;
+ const timefmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+(s%60).toFixed(1).padStart(4,'0');
+ const ok=o=>!!o&&[o.x,o.y,o.z].every(v=>typeof v==='number'&&Number.isFinite(v));
+
+ function updateStats(){
+  $('duration').textContent=timefmt(elapsed());
+  $('peak').textContent=samples.length?nfmt(peakMagnitude):'—';
+  if(intervals.length){const avg=intervals.reduce((a,b)=>a+b,0)/intervals.length;$('rate').textContent=(1000/avg).toFixed(1)}else $('rate').textContent='—';
+ }
+
+ // Shared path for every sensor source. inclG / lin are {x,y,z} in m/s².
+ function ingest(inclG,lin,via){
+  const useLinear=$('linear').checked;
+  let a=useLinear?lin:inclG;
+  let source=useLinear?'linear acceleration':'specific force (gravity-inclusive)';
+  if(!ok(a)){a=useLinear?inclG:lin;source=useLinear?'specific force fallback':'linear acceleration fallback'}
+  evCount++;
+  if(!ok(a)){evNull++;return false}
+  const t=performance.now(),x=a.x/g0,y=a.y/g0,z=a.z/g0;
+  const p={t,x,y,z,mag:Math.hypot(x,y,z),iso:new Date().toISOString(),source:source+' · '+via};
+  if(lastSensorTime!==null&&t>lastSensorTime){const dt=t-lastSensorTime;if(dt<=250){intervals.push(dt);if(intervals.length>80)intervals.shift()}else intervals=[]}
+  lastSensorTime=t;latest=p;live.push(p);
+  while(live.length&&live[0].t<t-LIVE_KEEP_MS)live.shift();
+  $('x').textContent=nfmt(p.x);$('y').textContent=nfmt(p.y);$('z').textContent=nfmt(p.z);$('mag').textContent=nfmt(p.mag);
+  if(recording&&!paused){samples.push({...p,elapsed:elapsed()});if(p.mag>peakMagnitude)peakMagnitude=p.mag;}
+  if(!sensorLive){
+   sensorLive=true;clearTimeout(probeTimer);
+   if(!recording)status('Sensor active',true);
+   say('Sensor is responding ('+via+').'+(source.includes('fallback')?' Requested signal unavailable; using '+source+'.':''));
+  }
+  return true;
+ }
+
+ // Primary source: DeviceMotionEvent (Safari, Chrome, Firefox).
+ function onMotion(e){
+  if(ingest(e.accelerationIncludingGravity,e.acceleration,'devicemotion')&&!dmAlive){dmAlive=true;stopGeneric()}
+ }
+
+ // Fallback for Chromium/Android: Generic Sensor API. Only used if devicemotion delivers nothing.
+ let gSensors=[],gAcc=null,gLin=null,gAccAlive=false;
+ function stopGeneric(){gSensors.forEach(s=>{try{s.stop()}catch(_){}});gSensors=[];gAcc=gLin=null;gAccAlive=false}
+ function startGeneric(){
+  stopGeneric();genErrors=[];
+  const mk=(Ctor,key)=>{
+   let s;
+   try{s=new Ctor({frequency:60})}catch(e){genErrors.push(key+' '+(e&&e.name||'Error'));return}
+   s.addEventListener('reading',()=>{
+    if(dmAlive)return;
+    const v={x:s.x,y:s.y,z:s.z};
+    if(key==='Accelerometer'){gAcc=v;gAccAlive=true;ingest(gAcc,gLin,'Generic Sensor API')}
+    else{gLin=v;if(!gAccAlive)ingest(gAcc,gLin,'Generic Sensor API')} // avoid double samples
+   });
+   // Don't announce "denied" from here: one sensor type can fail while another
+   // (or devicemotion) is delivering data. Errors are reported only if nothing works.
+   s.addEventListener('error',e=>{genErrors.push(key+' '+((e.error&&e.error.name)||'Error'));try{s.stop()}catch(_){}});
+   try{s.start();gSensors.push(s)}catch(e){genErrors.push(key+' '+(e&&e.name||'Error'))}
+  };
+  if('Accelerometer'in window)mk(Accelerometer,'Accelerometer');
+  if('LinearAccelerationSensor'in window)mk(LinearAccelerationSensor,'LinearAccelerationSensor');
+  return gSensors.length>0;
+ }
+
+ async function permState(name){try{return (await navigator.permissions.query({name})).state}catch(_){return 'n/a'}}
+
+ function diagnose(){
+  if(!window.isSecureContext)return 'This page is not in a secure context (https://). Browsers block motion sensors on file:// and http:// pages. Open it from its https:// address.';
+  if(window.self!==window.top)return 'This page is running inside a frame/preview, which blocks sensor access. Open it directly in its own browser tab.';
+  if(isIOS)return 'No readings. On iPhone use Safari (or Chrome/Firefox on iOS 13+), tap Enable and choose Allow. If you previously denied it: Safari address bar → aA → Website Settings → Motion & Orientation, or clear this site\'s data, then reload.';
+  if(/; wv\)/.test(navigator.userAgent)||/Claude/i.test(navigator.userAgent))return 'This looks like an in-app browser, which blocks sensors. Open the link in Chrome itself (⋮ → Open in Chrome).';
+  return 'No readings. Check that Android\'s "Sensors off" quick tile / developer option is off and battery saver is not restricting Chrome, then reload this tab and tap Enable sensor again.';
+ }
+
+ async function reportNoData(){
+  if(sensorLive)return;
+  const acc=await permState('accelerometer'),gyr=await permState('gyroscope');
+  if(sensorLive)return;
+  status('No data',false);
+  const details=' [events '+evCount+', empty '+evNull+', secure '+window.isSecureContext+', framed '+(window.self!==window.top)+', accelerometer '+acc+', gyroscope '+gyr+(genErrors.length?', errors: '+genErrors.join(', '):'')+']';
+  let msg;
+  if(acc==='denied'||gyr==='denied')msg='Chrome reports motion sensors as blocked for this site. Tap the icon left of the address → Permissions (or Site settings) → Motion sensors → Allow, then reload.';
+  else if(genErrors.some(e=>/NotAllowedError/.test(e)))msg='The site permission is allowed, but the browser refused sensor access for this page. That happens when the tab is not the focused top-level page (preview pane, in-app browser, split screen) or Android\'s sensor privacy toggle is on. '+diagnose();
+  else if(genErrors.some(e=>/NotReadableError/.test(e)))msg='The device reports that its accelerometer is unavailable or busy. Close other apps using motion sensors and reload. '+diagnose();
+  else msg=diagnose();
+  say(msg+details,true);
+  // Keep listening: if the sensor wakes up later, ingest() flips the status back to active.
+ }
+
+ async function enable(){
+  if(!window.isSecureContext){say(diagnose(),true);return}
+  // iOS: requestPermission must be the first thing awaited inside the tap handler.
+  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
+   try{
+    const permission=await DeviceMotionEvent.requestPermission();
+    if(permission!=='granted'&&isIOS){say('Motion permission was denied. Safari address bar → aA → Website Settings → Motion & Orientation (or clear site data), then reload and tap Enable again.',true);return}
+   }catch(e){
+    // Only iOS gates sensors behind this call. Elsewhere it may exist but reject; keep going.
+    if(isIOS){say('Permission request failed: '+(e&&e.message||e)+'. '+diagnose(),true);return}
+   }
+  }
+  if(!('DeviceMotionEvent'in window)&&!('Accelerometer'in window)&&!('LinearAccelerationSensor'in window)){say('This browser does not provide motion sensors. Try Safari (iPhone) or Chrome (Android). '+diagnose(),true);return}
+  window.removeEventListener('devicemotion',onMotion);
+  stopGeneric();clearTimeout(probeTimer);
+  latest=null;sensorLive=false;dmAlive=false;evCount=evNull=0;genErrors=[];
+  window.addEventListener('devicemotion',onMotion);
+  enabled=true;$('enable').textContent='Restart sensor';
+  $('record').disabled=false;if(!recording)status('Waiting for sensor',false);say('Waiting for readings…');
+  probeTimer=setTimeout(()=>{
+   if(sensorLive)return;
+   if(startGeneric())say('No motion events yet. Trying the Generic Sensor API…');
+   probeTimer=setTimeout(reportNoData,2500);
+  },2000);
+ }
+
+ // Screen wake lock: phones stop delivering sensor data when the screen sleeps.
+ let wakeLock=null;
+ async function keepAwake(on){
+  try{
+   if(on&&!wakeLock&&'wakeLock'in navigator&&document.visibilityState==='visible'){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}
+   else if(!on&&wakeLock){const w=wakeLock;wakeLock=null;await w.release()}
+  }catch(_){}
+ }
+ document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){if(recording&&!paused)hiddenDuringRecording=true}
+  else{
+   if(recording)keepAwake(true);
+   if(hiddenDuringRecording){hiddenDuringRecording=false;say('Note: the browser pauses motion sensors while this tab is in the background or the screen is off, so the log has a gap.',true)}
+  }
+ });
+
+ function startRecording(){
+  if(paused){pausedMs+=performance.now()-pauseAt;paused=false}
+  else{samples=[];markers=[];peakMagnitude=0;pausedMs=0;start=performance.now();renderMarkers()}
+  recording=true;updateStats();$('record').textContent='Stop';$('pause').disabled=false;$('pause').textContent='Pause';$('mark').disabled=false;$('export').disabled=false;
+  status('Recording',true);say(sensorLive?'Recording started.':'Recording started. Waiting for sensor readings…');keepAwake(true);
+ }
+ function stopRecording(){
+  finalElapsed=elapsed();recording=false;paused=false;$('record').textContent='Start recording';$('pause').disabled=true;$('pause').textContent='Pause';$('mark').disabled=true;
+  $('export').disabled=!samples.length;
+  status(sensorLive?'Sensor active · idle':enabled?'Waiting for sensor':'Sensor off',sensorLive);updateStats();keepAwake(false);
+  say('Recording stopped · '+samples.length.toLocaleString()+' samples.');
+ }
+ function togglePause(){
+  if(!recording)return;
+  if(!paused){paused=true;pauseAt=performance.now();$('pause').textContent='Resume';$('mark').disabled=true;status('Paused',false);say('Recording paused; live sensor display continues.')}
+  else{pausedMs+=performance.now()-pauseAt;paused=false;$('pause').textContent='Pause';$('mark').disabled=false;status('Recording',true);say('Recording resumed.')}
+ }
+ function renderMarkers(){
+  const el=$('markers');el.textContent=markers.length?markers.map((m,i)=>(i+1)+'. '+timefmt(m.elapsed)+' — '+m.label).join('   |   '):'No events marked.';
+ }
+ // Inline label instead of prompt(): a modal dialog suspends sensor events and leaves gaps in the log.
+ function mark(){
+  if(!recording||paused)return;
+  const input=$('markLabel'),label=input.value.trim()||'Event '+(markers.length+1);
+  markers.push({elapsed:elapsed(),t:performance.now(),label});input.value='';
+  renderMarkers();say('Marked "'+label+'" at '+timefmt(elapsed())+'.');
+ }
+ const csv=v=>'"'+String(v).replace(/"/g,'""')+'"';
+ function exportData(){
+  if(!samples.length){say('No samples recorded yet.',true);return}
+  const out=['iso_time,elapsed_s,x_g,y_g,z_g,resultant_g,sensor_source'];
+  for(const p of samples)out.push([p.iso,p.elapsed.toFixed(4),p.x.toFixed(6),p.y.toFixed(6),p.z.toFixed(6),p.mag.toFixed(6),p.source].map(csv).join(','));
+  out.push('','event_elapsed_s,event_label');for(const m of markers)out.push([m.elapsed.toFixed(4),m.label].map(csv).join(','));
+  const blob=new Blob([out.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='g-force-'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),30000); // revoking immediately can break downloads on Android Chrome
+ }
+ function reset(){
+  if(recording)stopRecording();
+  finalElapsed=0;samples=[];markers=[];live=[];intervals=[];peakMagnitude=0;latest=null;lastSensorTime=null;
+  ['x','y','z','mag','peak','rate'].forEach(id=>$(id).textContent='—');
+  $('export').disabled=true;renderMarkers();updateStats();
+  say(enabled?'Cleared. Live readings continue.':'Cleared.');
+ }
+
+ // Charts
+ let colors={};
+ const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+ const readColors=()=>{colors={x:css('--x'),y:css('--y'),z:css('--z'),mag:css('--mag'),grid:css('--grid'),muted:css('--muted'),accent:css('--accent')}};
+ function fit(c){
+  const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1,w=Math.round(r.width*d),h=Math.round(r.height*d);
+  if(c.width!==w||c.height!==h){c.width=w;c.height=h}
+  const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return{ctx,w:r.width,h:r.height};
+ }
+ function drawChart(c,keys,min,max,withMarkers){
+  const {ctx,w,h}=fit(c);if(w<50||h<50)return;
+  ctx.clearRect(0,0,w,h);
+  const L=36,R=6,T=6,B=18,pw=w-L-R,ph=h-T-B;
+  const win=+$('window').value*1000,now=performance.now(),t0=now-win;
+  const X=t=>L+(t-t0)/win*pw,Y=v=>T+(max-v)/(max-min)*ph;
+  ctx.font='11px system-ui,sans-serif';ctx.lineWidth=1;ctx.strokeStyle=colors.grid;ctx.fillStyle=colors.muted;
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let i=0;i<=4;i++){const v=min+(max-min)*i/4,y=Math.round(Y(v))+.5;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(String(+v.toFixed(2)),L-5,y)}
+  ctx.textBaseline='alphabetic';
+  const secs=win/1000,tick=secs<=10?2:secs<=30?5:10;
+  for(let s=0;s<=secs;s+=tick){const x=Math.round(X(now-s*1000))+.5;ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+ph);ctx.stroke();ctx.textAlign=s===0?'right':s===secs?'left':'center';ctx.fillText(s?'−'+s+'s':'now',x,h-4)}
+  ctx.save();ctx.beginPath();ctx.rect(L,T,pw,ph);ctx.clip();
+  if(withMarkers){ctx.setLineDash([4,4]);ctx.strokeStyle=colors.accent;for(const m of markers){if(m.t<t0)continue;const x=X(m.t);ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+ph);ctx.stroke()}ctx.setLineDash([])}
+  let i=0;while(i<live.length&&live[i].t<t0-200)i++;
+  ctx.lineWidth=1.6;ctx.lineJoin='round';
+  for(const k of keys){
+   ctx.strokeStyle=colors[k];ctx.beginPath();
+   for(let j=i;j<live.length;j++){const p=live[j],x=X(p.t),y=Y(p[k]);j===i?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+   ctx.stroke();
+  }
+  ctx.restore();
+ }
+ let lastStats=0;
+ function frame(now){
+  const s=+$('scale').value;
+  drawChart($('axesChart'),['x','y','z'],-s,s,true);
+  drawChart($('magChart'),['mag'],0,s,false);
+  if(now-lastStats>100){lastStats=now;updateStats()}
+  requestAnimationFrame(frame);
+ }
+
+ // Setup panel
+ const profileHints={
+  road:'Road profile: orient and secure the phone consistently. X/Y/Z are device axes until you align the phone with the vehicle.',
+  flight:'Flight profile is guidance only: it does not align or calibrate the phone axes, or calculate aircraft load factor. Secure the phone with its axes aligned to the aircraft body axes, then verify axis signs and offsets on the ground.'
+ };
+ $('profile').addEventListener('change',e=>{$('profileHint').textContent=profileHints[e.target.value]||''});
+
+ // Theme
+ const root=document.documentElement;
+ try{if(localStorage.getItem('gfr-theme')==='light')root.classList.add('light')}catch(_){}
+ readColors();
+ $('theme').addEventListener('click',()=>{root.classList.toggle('light');try{localStorage.setItem('gfr-theme',root.classList.contains('light')?'light':'dark')}catch(_){}readColors()});
+
+ // Wiring
+ $('enable').addEventListener('click',enable);
+ $('record').addEventListener('click',()=>recording?stopRecording():startRecording());
+ $('pause').addEventListener('click',togglePause);
+ $('mark').addEventListener('click',mark);
+ $('markLabel').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();mark()}});
+ $('export').addEventListener('click',exportData);
+ $('reset').addEventListener('click',reset);
+ if(!window.isSecureContext)say(diagnose(),true);
+ requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
