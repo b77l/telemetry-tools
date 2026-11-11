@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Audio Spectrum Analyzer</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#172438;--text:#e7edf5;--muted:#91a0b5;--line:#26364d;--accent:#58a6ff;--green:#43d19e;--red:#ff6878;--amber:#f2bd5b;--shadow:0 12px 32px #0002}
+:root.light{color-scheme:light;--bg:#f2f5f9;--panel:#fff;--panel2:#f5f8fc;--text:#172235;--muted:#68778d;--line:#dce4ee;--accent:#2478d4;--green:#139b70;--red:#d94b5b;--amber:#a87512;--shadow:0 8px 24px #1c355012}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.app{max-width:960px;margin:auto;padding:24px 18px 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{font-size:clamp(22px,4vw,29px);letter-spacing:-.5px;margin:0;font-weight:700}.sub{color:var(--muted);font-size:13px;margin-top:4px}
+button,select{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 13px}
+button{cursor:pointer;transition:.15s}button:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}button:disabled{opacity:.42;cursor:not-allowed}
+.theme{white-space:nowrap}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px;margin:13px 0;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.panel h2{font-size:15px;margin:0;font-weight:650}.hint{font-size:12px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:9px}.primary{background:var(--accent);border-color:var(--accent);color:white;font-weight:650}.danger{border-color:#a94755;color:var(--red)}.status{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-left:auto}.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}.dot.live{background:var(--red);box-shadow:0 0 0 4px #ff687822;animation:pulse 1.3s infinite}@keyframes pulse{50%{opacity:.45}}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px;min-width:0}.metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.metric .value{font-size:clamp(18px,3vw,24px);font-weight:700;font-variant-numeric:tabular-nums;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric .unit{font-size:11px;color:var(--muted);font-weight:500}
+canvas{display:block;width:100%;height:260px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.audio-wrap{display:grid;gap:10px}audio{width:100%;height:38px;filter: none}
+.settings{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.settings label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+select{padding:8px 10px;font-size:13px}.foot{color:var(--muted);font-size:12px;line-height:1.55;margin:15px 3px 0}
+#message{font-size:13px;color:var(--muted);margin-top:10px;min-height:18px}#message.error{color:var(--red)}
+@media(max-width:650px){.app{padding:17px 12px 30px}.panel{padding:13px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.status{width:100%;margin:3px 0 0}.top{align-items:flex-start}.controls button{flex:1}.settings{align-items:flex-start}.settings label{flex:1;justify-content:space-between}canvas{height:230px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div><h1>Audio Spectrum Analyzer</h1><div class="sub">Record · inspect · measure frequency content</div></div>
+    <button class="theme" id="themeBtn" type="button">☀ Light mode</button>
+  </header>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Recorder</h2><span class="hint" id="recordTime">00:00.0</span></div>
+    <div class="controls">
+      <button class="primary" id="recordBtn">● Record</button>
+      <button id="stopBtn" disabled>■ Stop &amp; analyze</button>
+      <button id="resetBtn" disabled>↺ Reset</button>
+      <span class="status"><span class="dot" id="statusDot"></span><span id="statusText">Microphone idle</span></span>
+    </div>
+    <div id="message">Allow microphone access when prompted. Recording stays in this browser session.</div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Signal measurements</h2><span class="hint">Calculated from the analyzed recording</span></div>
+    <div class="metrics">
+      <div class="metric"><div class="label">Duration</div><div class="value" id="mDuration">—</div></div>
+      <div class="metric"><div class="label">Peak frequency</div><div class="value" id="mPeak">—</div></div>
+      <div class="metric"><div class="label">Spectral centroid</div><div class="value" id="mCentroid">—</div></div>
+      <div class="metric"><div class="label">RMS level</div><div class="value" id="mRms">—</div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Frequency spectrum · FFT</h2><span class="hint" id="fftInfo">Waiting for recording</span></div>
+    <canvas id="spectrum" aria-label="Frequency spectrum chart"></canvas>
+    <div class="settings" style="margin-top:12px">
+      <label>FFT size <select id="fftSize"><option>2048</option><option selected>4096</option><option>8192</option><option>16384</option></select></label>
+      <label>Frequency scale <select id="freqScale"><option value="log" selected>Logarithmic</option><option value="linear">Linear</option></select></label>
+      <label>Maximum frequency <select id="maxFreq"><option value="8000">8 kHz</option><option value="12000">12 kHz</option><option value="20000" selected>20 kHz</option><option value="all">Full range</option></select></label>
+      <button id="reanalyzeBtn" disabled>Re-analyze</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Recording playback</h2><span class="hint" id="fileInfo">No audio loaded</span></div>
+    <div class="audio-wrap"><audio id="player" controls></audio>
+      <div class="controls"><button id="downloadBtn" disabled>↓ Download recording</button></div>
+    </div>
+  </section>
+  <p class="foot">Analysis uses a Hann-windowed FFT averaged across overlapping sections of the recording. The spectrum is an amplitude estimate in dBFS; it is not a calibrated sound-pressure-level (dB SPL) measurement. Frequency resolution is sample-rate ÷ FFT size. Microphone access generally requires HTTPS or localhost.</p>
+</main>
+<script>
+(() => {
+ const $=id=>document.getElementById(id);
+ let recorder=null,stream=null,chunks=[],blob=null,audioBuffer=null,startedAt=0,tick=null,objectUrl=null;
+ const canvas=$('spectrum'),ctx=canvas.getContext('2d');
+ const themeBtn=$('themeBtn');
+ themeBtn.onclick=()=>{document.documentElement.classList.toggle('light');themeBtn.textContent=document.documentElement.classList.contains('light')?'☾ Dark mode':'☀ Light mode';if(audioBuffer)analyze();else drawEmpty()};
+ const fmtTime=s=>{let m=Math.floor(s/60),sec=(s%60).toFixed(1);return String(m).padStart(2,'0')+':'+String(sec).padStart(4,'0')};
+ function message(t,error=false){$('message').textContent=t;$('message').classList.toggle('error',error)}
+ function setStatus(t,live=false){$('statusText').textContent=t;$('statusDot').classList.toggle('live',live)}
+ function resetMetrics(){['mDuration','mPeak','mCentroid','mRms'].forEach(id=>$(id).textContent='—');$('fftInfo').textContent='Waiting for recording'}
+ function colors(){let s=getComputedStyle(document.documentElement);return {text:s.getPropertyValue('--muted').trim(),line:s.getPropertyValue('--line').trim(),accent:s.getPropertyValue('--accent').trim(),green:s.getPropertyValue('--green').trim()}}
+ function resizeCanvas(){let dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);return {w:r.width,h:r.height}}
+ function drawEmpty(){let {w,h}=resizeCanvas(),c=colors();ctx.clearRect(0,0,w,h);ctx.fillStyle=c.text;ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('Your FFT spectrum will appear here after recording',w/2,h/2)}
+ function drawSpectrum(freqs,db,sr,n){
+  let {w,h}=resizeCanvas(),c=colors();ctx.clearRect(0,0,w,h);
+  const left=58,right=14,top=14,bottom=35,pw=w-left-right,ph=h-top-bottom;
+  let maxOpt=$('maxFreq').value, xmax=maxOpt==='all'?sr/2:Math.min(Number(maxOpt),sr/2);
+  const minF=$('freqScale').value==='log'?Math.max(10,sr/n):0;
+  const xMap=f=>$('freqScale').value==='log'?left+Math.log(f/minF)/Math.log(xmax/minF)*pw:left+f/xmax*pw;
+  ctx.font='11px system-ui';ctx.strokeStyle=c.line;ctx.fillStyle=c.text;ctx.lineWidth=1;
+  for(let j=0;j<=4;j++){let y=top+ph*j/4, val=0-j*20;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();ctx.textAlign='right';ctx.fillText(val+' dB',left-8,y+4)}
+  let ticks=$('freqScale').value==='log'?[minF,100,1000,10000,xmax].filter((v,i,a)=>v>=minF&&v<=xmax&&a.indexOf(v)===i):[0,.25,.5,.75,1].map(v=>v*xmax);
+  ticks.forEach(f=>{let x=xMap(Math.max(f,minF));ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,top+ph);ctx.stroke();ctx.textAlign='center';ctx.fillText(f>=1000?(f/1000).toFixed(f%1000?1:0)+'k':Math.round(f)+'',x,h-13)});
+  ctx.save();ctx.beginPath();ctx.rect(left,top,pw,ph);ctx.clip();ctx.beginPath();ctx.strokeStyle=c.accent;ctx.lineWidth=1.7;
+  let started=false;
+  for(let i=1;i<freqs.length;i++){let f=freqs[i];if(f<minF||f>xmax)continue;let x=xMap(f),y=top+Math.max(0,Math.min(100,(0-db[i])))/100*ph;if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}
+  ctx.stroke();ctx.restore();
+  ctx.fillStyle=c.text;ctx.textAlign='center';ctx.fillText('Frequency (Hz)',left+pw/2,h-2);
+ }
+ function fft(re,im){let n=re.length,j=0;for(let i=1;i<n;i++){let bit=n>>1;for(;j&bit;bit>>=1)j^=bit;j^=bit;if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]]}}
+  for(let len=2;len<=n;len<<=1){let ang=-2*Math.PI/len,wlenR=Math.cos(ang),wlenI=Math.sin(ang);for(let i=0;i<n;i+=len){let wr=1,wi=0;for(let k=0;k<len/2;k++){let u=i+k,v=i+k+len/2,tr=re[v]*wr-im[v]*wi,ti=re[v]*wi+im[v]*wr;re[v]=re[u]-tr;im[v]=im[u]-ti;re[u]+=tr;im[u]+=ti;let nw=wr*wlenR-wi*wlenI;wi=wr*wlenI+wi*wlenR;wr=nw}}}}
+ function analyze(){
+  if(!audioBuffer)return;
+  const n=Number($('fftSize').value),sr=audioBuffer.sampleRate,len=audioBuffer.length,channels=audioBuffer.numberOfChannels;
+  let data=new Float32Array(len);
+  for(let ch=0;ch<channels;ch++){let d=audioBuffer.getChannelData(ch);for(let i=0;i<len;i++)data[i]+=d[i]/channels}
+  let sumSq=0;for(let i=0;i<len;i++)sumSq+=data[i]*data[i];let rms=Math.sqrt(sumSq/len);
+  let bins=n/2, power=new Float64Array(bins), count=0, hop=Math.max(1,Math.floor(n/2));
+  let re=new Float64Array(n),im=new Float64Array(n),windowSum=0;
+  for(let i=0;i<n;i++)windowSum+=.5-.5*Math.cos(2*Math.PI*i/(n-1));
+  for(let start=0;start+n<=len;start+=hop){
+   for(let i=0;i<n;i++){re[i]=data[start+i]*(.5-.5*Math.cos(2*Math.PI*i/(n-1)));im[i]=0}
+   fft(re,im);for(let k=0;k<bins;k++)power[k]+=(re[k]*re[k]+im[k]*im[k]);count++;
+  }
+  if(!count){message('Recording is shorter than the selected FFT window. Choose a smaller FFT size.',true);return}
+  let db=new Float64Array(bins),freqs=new Float64Array(bins),peakK=1,peakP=0,weighted=0,total=0;
+  for(let k=1;k<bins;k++){let p=power[k]/count;freqs[k]=k*sr/n;let amp=2*Math.sqrt(p)/(windowSum);db[k]=20*Math.log10(Math.max(amp,1e-7));if(p>peakP){peakP=p;peakK=k}weighted+=freqs[k]*p;total+=p}
+  $('mDuration').textContent=audioBuffer.duration.toFixed(2)+' s';
+  $('mPeak').textContent=freqs[peakK]>=1000?(freqs[peakK]/1000).toFixed(2)+' kHz':Math.round(freqs[peakK])+' Hz';
+  $('mCentroid').textContent=total?(weighted/total>=1000?(weighted/total/1000).toFixed(2)+' kHz':Math.round(weighted/total)+' Hz'):'—';
+  $('mRms').textContent=(20*Math.log10(Math.max(rms,1e-8))).toFixed(1)+' dBFS';
+  $('fftInfo').textContent=n+' points · '+(sr/n).toFixed(1)+' Hz/bin · '+count+' windows';
+  drawSpectrum(freqs,db,sr,n);message('Analysis complete. Adjust FFT settings and select Re-analyze to inspect the spectrum at another resolution.');
+ }
+ async function decodeRecording(){
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('Web Audio API is not supported by this browser.');
+  const ac=new AC();try{audioBuffer=await ac.decodeAudioData(await blob.arrayBuffer())}finally{await ac.close()}
+  $('player').src=objectUrl;$('fileInfo').textContent=(blob.size/1024).toFixed(1)+' KB · '+(blob.type||'audio recording');
+  $('downloadBtn').disabled=false;$('resetBtn').disabled=false;$('reanalyzeBtn').disabled=false;analyze();
+ }
+ $('recordBtn').onclick=async()=>{
+  try{
+   if(!navigator.mediaDevices?.getUserMedia)throw new Error('Microphone recording requires HTTPS or localhost in a supported browser.');
+   stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+   let mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported(t));
+   recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);chunks=[];
+   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+   recorder.onerror=()=>message('A recording error occurred.',true);
+   recorder.onstop=async()=>{
+    clearInterval(tick);stream?.getTracks().forEach(t=>t.stop());stream=null;
+    blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(blob);
+    setStatus('Recording ready');$('recordBtn').disabled=false;$('stopBtn').disabled=true;
+    try{await decodeRecording()}catch(e){message('Could not decode this recording: '+e.message,true)}
+   };
+   recorder.start(250);startedAt=performance.now();setStatus('Recording',true);$('recordBtn').disabled=true;$('stopBtn').disabled=false;message('Recording microphone input…');
+   tick=setInterval(()=>$('recordTime').textContent=fmtTime((performance.now()-startedAt)/1000),100);
+  }catch(e){setStatus('Microphone unavailable');message(e.message||String(e),true);stream?.getTracks().forEach(t=>t.stop())}
+ };
+ $('stopBtn').onclick=()=>{if(recorder&&recorder.state!=='inactive'){recorder.stop();setStatus('Processing recording')}};
+ $('resetBtn').onclick=()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=null;blob=null;audioBuffer=null;$('player').removeAttribute('src');$('player').load();$('fileInfo').textContent='No audio loaded';$('downloadBtn').disabled=true;$('resetBtn').disabled=true;$('reanalyzeBtn').disabled=true;$('recordTime').textContent='00:00.0';resetMetrics();drawEmpty();setStatus('Microphone idle');message('Ready for a new recording.')};
+ $('reanalyzeBtn').onclick=analyze;
+ ['fftSize','freqScale','maxFreq'].forEach(id=>$(id).addEventListener('change',()=>{if(audioBuffer)analyze()}));
+ $('downloadBtn').onclick=()=>{if(!blob)return;let a=document.createElement('a');a.href=objectUrl;a.download='audio-recording.'+(blob.type.includes('mp4')?'mp4':'webm');a.click()};
+ window.addEventListener('resize',()=>audioBuffer?analyze():drawEmpty());drawEmpty();
+})();
+</script>
+</body>
+</html>
