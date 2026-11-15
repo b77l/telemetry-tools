@@ -102,6 +102,7 @@ const MAX_SAMPLES=100000, KEEP_MS=120000;
 let motionEnabled=false, recording=false, paused=false, log=[], events=[], timer=null;
 let startTime=0, pausedMs=0, pauseAt=0, lastUi=0, lastHistorySample=0, peak=0, csvBytes=0;
 let rawAcc=null, rawAccKind='unknown', orientation=null, zeroQ=null, zeroBaseline=null, zeroSet=false;
+let zeroBeta=null, zeroGamma=null, filteredBeta=null, filteredGamma=null, orientationFilterTime=0;
 let pressure=null, pressureOffsetM=0, tempC=null, heading=null, gps=null, gpsWatch=null;
 let genericSensor=null, genericTimer=null, orientationSensor=null, pressureSensor=null;
 const history={gx:[],gy:[],gz:[],mag:[],pitch:[],roll:[],alt:[],temp:[],compass:[]};
@@ -109,17 +110,42 @@ const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.togg
 const n=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'—';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const timeFmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
-function quatFromEuler(alpha,beta,gamma){const a=(alpha||0)*RAD/2,b=(beta||0)*RAD/2,g=(gamma||0)*RAD/2,cA=Math.cos(a),sA=Math.sin(a),cB=Math.cos(b),sB=Math.sin(b),cG=Math.cos(g),sG=Math.sin(g);return {w:cA*cB*cG-sA*sB*sG,x:cA*sB*cG-sA*cB*sG,y:cA*cB*sG+sA*sB*cG,z:sA*cB*cG+cA*sB*sG}}
+function quatFromEuler(alpha,beta,gamma){const a=alpha*RAD/2,b=beta*RAD/2,g=gamma*RAD/2,cA=Math.cos(a),sA=Math.sin(a),cB=Math.cos(b),sB=Math.sin(b),cG=Math.cos(g),sG=Math.sin(g);return {w:cA*cB*cG-sA*sB*sG,x:cA*sB*cG-sA*cB*sG,y:cA*cB*sG+sA*sB*cG,z:sA*cB*cG+cA*sB*sG}}
 function qConj(q){return {w:q.w,x:-q.x,y:-q.y,z:-q.z}}
 function qMul(a,b){return {w:a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z,x:a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y,y:a.w*b.y-a.x*b.z+a.y*b.w+a.z*b.x,z:a.w*b.z+a.x*b.y-a.y*b.x+a.z*b.w}}
 function qRotate(q,v){const p={w:0,x:v.x,y:v.y,z:v.z},r=qMul(qMul(q,p),qConj(q));return {x:r.x,y:r.y,z:r.z}}
+function wrap180(a){return ((a+180)%360+360)%360-180}
 function orientationQuaternion(){if(!orientation)return null;return orientation.q||quatFromEuler(orientation.alpha,orientation.beta,orientation.gamma)}
 function relQuaternion(){const q=orientationQuaternion();if(!q)return null;return zeroQ?qMul(qConj(zeroQ),q):q}
-function getAttitude(){const q=relQuaternion();if(!q)return null;const pitch=Math.asin(clamp(2*(q.w*q.y-q.z*q.x),-1,1))*DEG;const roll=Math.atan2(2*(q.w*q.x+q.y*q.z),1-2*(q.x*q.x+q.y*q.y))*DEG;return {pitch,roll,q}}
-function transformedAcc(){if(!rawAcc)return null;const v={x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G};if(!zeroQ)return {x:v.x,y:-v.y,z:v.z};const q=relQuaternion();if(!q)return null;const r=qRotate(q,v);if(zeroBaseline){r.x-=zeroBaseline.x;r.y-=zeroBaseline.y;r.z-=zeroBaseline.z}/* Body convention: +X right, +Y forward (phone top edge forward), +Z up. DeviceOrientation/Android screen Y sign is opposite this requested forward convention. */r.y=-r.y;return r}
+function getAttitude(){
+ if(!orientation||!Number.isFinite(orientation.beta)||!Number.isFinite(orientation.gamma))return null;
+ // DeviceOrientation defines beta as rotation about device X and gamma about device Y.
+ // For the chosen mounting convention (top edge forward), beta is pitch and gamma is roll.
+ const pitch=zeroBeta===null?orientation.beta:wrap180(orientation.beta-zeroBeta);
+ const roll=zeroGamma===null?orientation.gamma:wrap180(orientation.gamma-zeroGamma);
+ return {pitch,roll,q:relQuaternion()};
+}
+function transformedAcc(){if(!rawAcc)return null;const v={x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G};if(!zeroQ)return {x:v.x,y:-v.y,z:v.z};const q=relQuaternion();if(!q)return null;const r=qRotate(q,v);if(zeroBaseline){r.x-=zeroBaseline.x;r.y-=zeroBaseline.y;r.z-=zeroBaseline.z}/* Body convention: +X right, +Y forward, +Z up. */r.y=-r.y;return r}
 function setRaw(x,y,z,kind){if(![x,y,z].every(Number.isFinite))return;rawAcc={x,y,z};rawAccKind=kind}
 function onMotion(e){const a=e.acceleration;if(a&&[a.x,a.y,a.z].every(Number.isFinite)){setRaw(a.x,a.y,a.z,'linear');return}const b=e.accelerationIncludingGravity;if(b&&[b.x,b.y,b.z].every(Number.isFinite))setRaw(b.x,b.y,b.z,'gravity-inclusive')}
-function onOrientation(e){if(e.alpha===null&&e.beta===null&&e.gamma===null)return;const a=Number.isFinite(e.alpha)?e.alpha:0,b=Number.isFinite(e.beta)?e.beta:0,g=Number.isFinite(e.gamma)?e.gamma:0;orientation={alpha:a,beta:b,gamma:g,absolute:!!e.absolute,q:quatFromEuler(a,b,g)};if(Number.isFinite(e.webkitCompassHeading))heading=(e.webkitCompassHeading+360)%360;else if(e.absolute&&Number.isFinite(e.alpha))heading=(360-e.alpha+360)%360}
+function onOrientation(e){
+ // Reject incomplete events instead of silently replacing missing axes with zero.
+ if(!Number.isFinite(e.beta)||!Number.isFinite(e.gamma)||!Number.isFinite(e.alpha))return;
+ const now=performance.now(),dt=orientationFilterTime?clamp((now-orientationFilterTime)/1000,.005,.25):.05;
+ const maxStep=180*dt; // reject implausibly fast jumps while preserving normal hand movement
+ if(filteredBeta===null||filteredGamma===null){filteredBeta=e.beta;filteredGamma=e.gamma}
+ else{
+  const db=wrap180(e.beta-filteredBeta),dg=wrap180(e.gamma-filteredGamma);
+  const targetBeta=wrap180(filteredBeta+clamp(db,-maxStep,maxStep));
+  const targetGamma=wrap180(filteredGamma+clamp(dg,-maxStep,maxStep));
+  const alpha=1-Math.exp(-dt/.12);
+  filteredBeta=wrap180(filteredBeta+wrap180(targetBeta-filteredBeta)*alpha);
+  filteredGamma=wrap180(filteredGamma+wrap180(targetGamma-filteredGamma)*alpha);
+ }
+ orientationFilterTime=now;
+ orientation={alpha:e.alpha,beta:filteredBeta,gamma:filteredGamma,absolute:!!e.absolute,q:quatFromEuler(e.alpha,filteredBeta,filteredGamma)};
+ if(Number.isFinite(e.webkitCompassHeading))heading=(e.webkitCompassHeading+360)%360;else if(e.absolute)heading=(360-e.alpha+360)%360;
+}
 function startGenericFallback(){if(genericSensor)return;try{if('LinearAccelerationSensor'in window){genericSensor=new LinearAccelerationSensor({frequency:30});genericSensor.addEventListener('reading',()=>setRaw(genericSensor.x*G,genericSensor.y*G,genericSensor.z*G,'linear'));genericSensor.addEventListener('error',e=>console.warn('Linear sensor',e.error));genericSensor.start();return}}catch(e){console.warn('Linear sensor unavailable',e)}try{if('Accelerometer'in window){genericSensor=new Accelerometer({frequency:30});genericSensor.addEventListener('reading',()=>setRaw(genericSensor.x*G,genericSensor.y*G,genericSensor.z*G,'gravity-inclusive'));genericSensor.addEventListener('error',e=>console.warn('Accelerometer',e.error));genericSensor.start()}}catch(e){console.warn('Accelerometer unavailable',e)}}
 function startOrientationFallback(){
  if(orientationSensor)return;
@@ -131,7 +157,7 @@ function startOrientationFallback(){
    sensor.addEventListener('reading',()=>{
     const q=sensor.quaternion;
     if(!q||q.length!==4)return;
-    orientation={q:{x:q[0],y:q[1],z:q[2],w:q[3]},alpha:0,beta:0,gamma:0,absolute:name==='AbsoluteOrientationSensor'};
+    {const qq={x:q[0],y:q[1],z:q[2],w:q[3]};const beta=Math.asin(clamp(2*(qq.w*qq.x-qq.y*qq.z),-1,1))*DEG;const gamma=Math.atan2(2*(qq.w*qq.y+qq.x*qq.z),1-2*(qq.y*qq.y+qq.z*qq.z))*DEG;orientation={q:qq,alpha:0,beta,gamma,absolute:name==='AbsoluteOrientationSensor'};}
    });
    sensor.addEventListener('error',e=>console.warn(name+' error',e.error));
    sensor.start();orientationSensor=sensor;
@@ -141,9 +167,9 @@ function startOrientationFallback(){
  }
 }
 function startOptionalSensors(){const p=('PressureSensor'in window)?'Experimental PressureSensor API detected; reading integration still required':'Barometer hardware confirmed by Samsung diagnostics, but Chrome exposes no standard webpage pressure API';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: device/browser dependent. The Samsung hardware test confirms pressure hardware; this webpage cannot directly call Android SensorManager.'}
-async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
+async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
 function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
-function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';say('Reference captured. Attitude and axes are now relative to this mounting orientation. Zero while stationary; re-zero after changing the phone mount.')}
+function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   |   ')}say('Reference captured. Pitch and roll are now zero at this mounting attitude; acceleration axes are referenced to the same orientation. Re-zero after changing the mount. An ATTITUDE ZERO event was added to the log if recording.')}
 function baroAltitudeM(){if(!Number.isFinite(pressure))return null;const qnh=clamp(parseFloat($('qnh').value)||1013.25,850,1100);const pressureAlt=44330*(1-Math.pow(pressure/qnh,0.190294957));return pressureAlt-pressureOffsetM}
 function baroFeet(){const a=baroAltitudeM();return a===null?null:a*3.280839895}
 function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return ['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8]+' · MAG'}
@@ -245,8 +271,8 @@ function startLog(){if(!rawAcc){say('No acceleration samples received yet. Enabl
 function pauseLog(){if(!recording)return;if(!paused){paused=true;pauseAt=performance.now();$('pauseBtn').textContent='Resume';$('logState').textContent='Paused'}else{pausedMs+=performance.now()-pauseAt;paused=false;$('pauseBtn').textContent='Pause';$('logState').textContent='Recording'}}
 function stopLog(){if(timer)clearInterval(timer);timer=null;recording=false;paused=false;$('recordBtn').disabled=false;$('pauseBtn').disabled=true;$('stopBtn').disabled=true;$('pauseBtn').textContent='Pause';$('markBtn').disabled=true;$('logState').textContent='Stopped'}
 function mark(){if(!recording||paused)return;const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'EVENT'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   | ')}
-function exportCsv(){if(!log.length){say('No recorded samples to export.',true);return}const rows=[csvHeader,...log.map(r=>r.map(v=>typeof v==='number'?String(v):v).join(',')),'','event_time_s,event_label',...events.map(e=>e.t+',EVENT')];const blob=new Blob([rows.join('\n')],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='telemetry-log-'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);say('CSV export prepared.')}
-function resetAll(){if(recording)stopLog();log=[];events=[];peak=0;csvBytes=0;Object.keys(history).forEach(k=>history[k]=[]);$('events').textContent='No event markers.';$('elapsed').textContent='00:00';$('sampleCount').textContent='0';$('peakG').textContent='—';$('fileSize').textContent='0 KB';say('Session reset. Sensor references remain unchanged.')}
+function exportCsv(){if(!log.length){say('No recorded samples to export.',true);return}const rows=[csvHeader,...log.map(r=>r.map(v=>typeof v==='number'?String(v):v).join(',')),'','event_time_s,event_label',...events.map(e=>e.t+','+e.label)];const blob=new Blob([rows.join('\n')],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='telemetry-log-'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);say('CSV export prepared.')}
+function resetAll(){if(recording)stopLog();log=[];events=[];peak=0;csvBytes=0;Object.keys(history).forEach(k=>history[k]=[]);$('events').textContent='No event markers.';$('elapsed').textContent='00:00';$('sampleCount').textContent='0';$('peakG').textContent='—';$('fileSize').textContent='0 KB';say('Session reset. Session data cleared; attitude zero reference is retained. Press Capture attitude reference to redefine zero pitch and roll without erasing an active sensor stream.')}
 function setPressureZero(){say('No barometric pressure feed is available in this browser build. QNH and baro-zero controls are placeholders until a supported external sensor interface is added.',true)}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('carView').classList.toggle('active',b.dataset.tab==='car');$('flightView').classList.toggle('active',b.dataset.tab==='flight');requestAnimationFrame(()=>{drawPfd(getAttitude(),current());drawAllCharts()})}));
 $('themeBtn').addEventListener('click',()=>{document.documentElement.classList.toggle('light');try{localStorage.setItem('telemetryTheme',document.documentElement.classList.contains('light')?'light':'dark')}catch(e){}drawAllCharts()});try{if(localStorage.getItem('telemetryTheme')==='light')document.documentElement.classList.add('light')}catch(e){}
