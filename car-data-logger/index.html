@@ -121,13 +121,27 @@ function qRotate(q,v){const p={w:0,x:v.x,y:v.y,z:v.z},r=qMul(qMul(q,p),qConj(q))
 function wrap180(a){return ((a+180)%360+360)%360-180}
 function orientationQuaternion(){if(!orientation)return null;return orientation.q||quatFromEuler(orientation.alpha,orientation.beta,orientation.gamma)}
 function relQuaternion(){const q=orientationQuaternion();if(!q)return null;return zeroQ?qMul(qConj(zeroQ),q):q}
+function extractZXY(q){
+ // DeviceOrientation's intrinsic Z-X'-Y'' convention is represented by
+ // q = qZ(alpha) * qX(beta) * qY(gamma). Extract the relative rotation
+ // as a complete Euler solution; do not subtract beta/gamma independently.
+ const m=Math.hypot(q.w,q.x,q.y,q.z);
+ if(!Number.isFinite(m)||m<1e-9)return null;
+ const w=q.w/m,x=q.x/m,y=q.y/m,z=q.z/m;
+ const r21=2*(x*w+y*z);
+ const pitch=Math.asin(clamp(r21,-1,1))*DEG;
+ const r20=2*(x*z-w*y);
+ const r22=1-2*(x*x+y*y);
+ const roll=Math.atan2(-r20,r22)*DEG;
+ return {pitch,roll};
+}
 function getAttitude(){
- if(!orientation||!Number.isFinite(orientation.beta)||!Number.isFinite(orientation.gamma))return null;
- // DeviceOrientation defines beta as rotation about device X and gamma about device Y.
- // For the chosen mounting convention (top edge forward), beta is pitch and gamma is roll.
- const pitch=zeroBeta===null?orientation.beta:wrap180(orientation.beta-zeroBeta);
- const roll=zeroGamma===null?orientation.gamma:wrap180(orientation.gamma-zeroGamma);
- return {pitch,roll,q:relQuaternion()};
+ if(!orientation)return null;
+ const q=relQuaternion();
+ if(!q)return null;
+ const angles=extractZXY(q);
+ if(!angles)return null;
+ return {pitch:angles.pitch,roll:angles.roll,q};
 }
 function transformedAcc(){if(!rawAcc)return null;const v={x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G};if(!zeroQ)return {x:v.x,y:-v.y,z:v.z};const q=relQuaternion();if(!q)return null;const r=qRotate(q,v);if(zeroBaseline){r.x-=zeroBaseline.x;r.y-=zeroBaseline.y;r.z-=zeroBaseline.z}/* Body convention: +X right, +Y forward, +Z up. */r.y=-r.y;return r}
 function setRaw(x,y,z,kind){if(![x,y,z].every(Number.isFinite))return;rawAcc={x,y,z};rawAccKind=kind}
@@ -173,7 +187,7 @@ function startOrientationFallback(){
 function startOptionalSensors(){const p=('PressureSensor'in window)?'Experimental PressureSensor API detected; reading integration still required':'Barometer hardware confirmed by Samsung diagnostics, but Chrome exposes no standard webpage pressure API';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: device/browser dependent. The Samsung hardware test confirms pressure hardware; this webpage cannot directly call Android SensorManager.'}
 async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
 function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
-function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   |   ')}say('Reference captured. Pitch and roll are now zero at this mounting attitude; acceleration axes are referenced to the same orientation. Re-zero after changing the mount. An ATTITUDE ZERO event was added to the log if recording.')}
+function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   |   ')}say('Reference captured. The complete 3D mounting orientation is now the reference. Pitch and roll are resolved from the relative quaternion; acceleration axes use the same reference frame. Re-zero after changing the mount. An ATTITUDE ZERO event was added to the log if recording.')}
 function baroAltitudeM(){if(!Number.isFinite(pressure))return null;const qnh=clamp(parseFloat($('qnh').value)||1013.25,850,1100);const pressureAlt=44330*(1-Math.pow(pressure/qnh,0.190294957));return pressureAlt-pressureOffsetM}
 function baroFeet(){const a=baroAltitudeM();return a===null?null:a*3.280839895}
 function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return ['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8]+' · MAG'}
