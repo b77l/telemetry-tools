@@ -7,6 +7,7 @@
         <li><a href="./screen-tapper/">⏱️ Tap Interval Instrument</a></li>
         <li><a href="./audio-spectrum-analyzer/">🔊 Audio Spectrum Analyzer</a></li>
         <li><a href="./flight-data-logger/">✈️ Flight Data Logger</a></li>
+        <li><a href="./car-data-logger/">🚘 Car Data Logger</a></li>
     </ul>
 </body>
 </html>
