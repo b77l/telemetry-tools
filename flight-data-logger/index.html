@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08111f">
-<title>Telemetry Instruments · Flight</title>
+<title>Telemetry Instruments · Flight V4</title>
 <style>
 :root{color-scheme:dark;--bg:#07111e;--panel:#101d2e;--panel2:#17263a;--line:#2a3c54;--fg:#e8f0fb;--muted:#91a5bd;--cyan:#57c7ef;--green:#6bd6a3;--amber:#f3bd65;--red:#ff747d;--blue:#4c9cff}
 :root.light{color-scheme:light;--bg:#edf2f7;--panel:#fff;--panel2:#f1f5fa;--line:#d3deea;--fg:#18283c;--muted:#64758b;--cyan:#087fae;--green:#16865b;--amber:#a86a09;--red:#c63843;--blue:#176dcc}
@@ -85,7 +85,7 @@ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
   </div>
   <div class="grid2">
    <div class="instrument"><b>INCLINOMETER · RELATIVE ATTITUDE</b><div class="big cyan" id="flightPitch">—° PITCH</div><div class="big green" id="flightRoll">—° ROLL</div><canvas id="flightTiltChart"></canvas></div>
-   <div class="instrument"><b>ALTIMETER · GPS</b><div class="big amber" id="flightAltLarge">— ft</div><div class="tiny" id="flightAltLargeM">— m</div><div class="tiny" id="flightAltAccuracy">GPS vertical accuracy unavailable</div><canvas id="flightAltChart"></canvas></div>
+   <div class="instrument"><b>ALTIMETER · GPS + BARO</b><div class="big amber" id="flightAltLarge">— ft</div><div class="tiny" id="flightAltLargeM">— m</div><div class="tiny" id="flightAltAccuracy">GPS vertical accuracy unavailable</div><div class="tiny" id="flightBaroAlt">BARO ALT: waiting for pressure sensor</div><div class="tiny">GRAPH: GPS altitude (cyan) · barometric altitude (amber)</div><canvas id="flightAltChart"></canvas></div>
    <div class="instrument"><b>TEMPERATURE</b><div class="big" id="flightTempLarge">— °C</div><div class="tiny" id="flightTempLargeF">— °F</div><canvas id="flightTempChart"></canvas></div>
    <div class="instrument"><b>COMPASS</b><div class="big cyan" id="flightCompass">—°</div><div class="tiny" id="flightCardinal">Heading unavailable</div><canvas id="flightCompassChart"></canvas></div>
   </div>
@@ -121,11 +121,11 @@ const MAX_SAMPLES=100000, KEEP_MS=120000;
 let motionEnabled=false, recording=false, paused=false, log=[], events=[], timer=null;
 let startTime=0, pausedMs=0, pauseAt=0, lastUi=0, lastHistorySample=0, peak=0, csvBytes=0;
 let rawAcc=null, rawAccKind='unknown', orientation=null, zeroQ=null, zeroBaseline=null, zeroSet=false;
-let rawGravity=null, magField=null, compassSensor=null, headingIsAbsolute=false, headingSource='waiting for absolute heading';
+let rawGravity=null, magField=null, compassSensor=null, headingIsAbsolute=false, headingSource='waiting for absolute heading', compassDiag='no orientation event yet', orientationEventCount=0, absoluteEventCount=0;
 let zeroBeta=null, zeroGamma=null, filteredBeta=null, filteredGamma=null, orientationFilterTime=0;
-let pressure=null, pressureOffsetM=0, tempC=null, heading=null, gps=null, gpsWatch=null;
+let pressure=null, pressureOffsetM=0, pressureStatus='not started', tempC=null, heading=null, gps=null, gpsWatch=null;
 let genericSensor=null, genericTimer=null, orientationSensor=null, pressureSensor=null;
-const history={gx:[],gy:[],gz:[],mag:[],pitch:[],roll:[],alt:[],temp:[],compass:[]};
+const history={gx:[],gy:[],gz:[],mag:[],pitch:[],roll:[],alt:[],baroAlt:[],temp:[],compass:[]};
 const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.toggle('error',err)};
 const n=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'—';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -163,9 +163,10 @@ function transformedAcc(){if(!rawAcc)return null;const v={x:rawAcc.x/G,y:rawAcc.
 function setRaw(x,y,z,kind){if(![x,y,z].every(Number.isFinite))return;rawAcc={x,y,z};rawAccKind=kind}
 function onMotion(e){const b=e.accelerationIncludingGravity;if(b&&[b.x,b.y,b.z].every(Number.isFinite)){rawGravity={x:b.x,y:b.y,z:b.z};if(!headingIsAbsolute)updateMagCompass()}const a=e.acceleration;if(a&&[a.x,a.y,a.z].every(Number.isFinite)){setRaw(a.x,a.y,a.z,'linear');return}if(b&&[b.x,b.y,b.z].every(Number.isFinite))setRaw(b.x,b.y,b.z,'gravity-inclusive')}
 function onOrientation(e){
- // Absolute readings take priority; relative events must never erase a valid heading.
+ // Accept both deviceorientation and deviceorientationabsolute. Absolute
+ // readings take priority; relative events must never erase a valid heading.
  if(!Number.isFinite(e.beta)||!Number.isFinite(e.gamma)||!Number.isFinite(e.alpha))return;
- const absolute=!!e.absolute||e.__forceAbsolute===true;
+ const absolute=!!e.absolute||e.__forceAbsolute===true;orientationEventCount++;if(absolute)absoluteEventCount++;compassDiag=(e.__forceAbsolute?'absolute event':(absolute?'absolute orientation':'relative orientation'))+' · α '+e.alpha.toFixed(1)+'° · events '+orientationEventCount+'/'+absoluteEventCount+' abs';
  const now=performance.now(),dt=orientationFilterTime?clamp((now-orientationFilterTime)/1000,.005,.25):.05;
  const maxStep=180*dt;
  if(filteredBeta===null||filteredGamma===null){filteredBeta=e.beta;filteredGamma=e.gamma}
@@ -179,11 +180,14 @@ function onOrientation(e){
  }
  orientationFilterTime=now;
  orientation={alpha:e.alpha,beta:filteredBeta,gamma:filteredGamma,absolute,q:quatFromEuler(e.alpha,filteredBeta,filteredGamma)};
- if(Number.isFinite(e.webkitCompassHeading)){
+ if(Number.isFinite(e.webkitCompassHeading)){compassDiag+=' · webkit heading '+e.webkitCompassHeading.toFixed(1)+'°';
   heading=(e.webkitCompassHeading+360)%360;headingIsAbsolute=true;headingSource='webkitCompassHeading';
  }else if(absolute){
   heading=((360-e.alpha)%360+360)%360;headingIsAbsolute=true;headingSource=e.__forceAbsolute?'deviceorientationabsolute':'deviceorientation absolute';
- }else if(!headingIsAbsolute){headingSource='waiting for absolute heading';updateMagCompass()}
+ }else if(!headingIsAbsolute){
+  headingSource='waiting for absolute heading';
+  updateMagCompass();
+ }
 }
 function onAbsoluteOrientation(e){
  if(!Number.isFinite(e.alpha)||!Number.isFinite(e.beta)||!Number.isFinite(e.gamma))return;
@@ -211,37 +215,62 @@ function startOrientationFallback(){
  }
 }
 function updateMagCompass(){
- if(!magField||!rawGravity||headingIsAbsolute)return;
+ // Prefer browser-provided absolute heading when available. Otherwise derive
+ // a tilt-compensated magnetic heading from the Magnetometer + gravity vector.
+ if(!magField||!rawGravity)return;
  const norm=v=>{const m=Math.hypot(v.x,v.y,v.z);return m>1e-6?{x:v.x/m,y:v.y/m,z:v.z/m}:null};
  const dot=(a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
  const cross=(a,b)=>({x:a.y*b.z-a.z*b.y,y:a.z*b.x-a.x*b.z,z:a.x*b.y-a.y*b.x});
  const up=norm(rawGravity);if(!up)return;
  const projection=dot(magField,up),north=norm({x:magField.x-projection*up.x,y:magField.y-projection*up.y,z:magField.z-projection*up.z});
  if(!north)return;const east=norm(cross(up,north));if(!east)return;
+ // Device +Y is the phone's top edge. Project it onto the horizontal plane.
  const top={x:0,y:1,z:0},v={x:top.x-dot(top,up)*up.x,y:top.y-dot(top,up)*up.y,z:top.z-dot(top,up)*up.z};
  const hn=dot(v,north),he=dot(v,east);if(Math.hypot(hn,he)<1e-5)return;
- heading=(Math.atan2(he,hn)*DEG+360)%360;headingSource='magnetometer';
+ heading=(Math.atan2(he,hn)*DEG+360)%360;
 }
 function startCompassSensors(){
  if(!('Magnetometer' in window)){headingSource='waiting for deviceorientationabsolute';return}
  if(compassSensor)return;
  try{const S=window.Magnetometer,s=new S({frequency:20,referenceFrame:'device'});
-  s.addEventListener('reading',()=>{magField={x:s.x,y:s.y,z:s.z};if(!headingIsAbsolute)updateMagCompass()});
+  s.addEventListener('reading',()=>{magField={x:s.x,y:s.y,z:s.z};if(!headingIsAbsolute){headingSource='magnetometer';compassDiag='magnetometer + gravity';updateMagCompass()}});
   s.addEventListener('error',e=>{console.warn('Magnetometer error',e.error);headingSource='magnetometer blocked';$('sensorAvailability').textContent='Compass sensor unavailable: '+(e.error?.message||'permission or hardware restriction')+'; waiting for deviceorientationabsolute'});
   s.start();compassSensor=s;
- }catch(e){console.warn('Magnetometer unavailable',e);headingSource='magnetometer unavailable'}
+ }catch(e){console.warn('Magnetometer unavailable',e)}
 }
-function startOptionalSensors(){const p=('PressureSensor'in window)?'Experimental PressureSensor API detected; reading integration still required':'Barometer hardware confirmed by Samsung diagnostics, but Chrome exposes no standard webpage pressure API';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: device/browser dependent. The Samsung hardware test confirms pressure hardware; this webpage cannot directly call Android SensorManager.'}
-async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onAbsoluteOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();startCompassSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
+
+function startPressureSensor(){
+ if(pressureSensor)return;
+ // The proposed ambient barometer API is named Barometer. Keep the earlier
+ // PressureSensor name as a defensive experimental alias, but never fake data.
+ const SensorType=('Barometer' in window)?window.Barometer:(('PressureSensor' in window)?window.PressureSensor:null);
+ if(!SensorType){pressureStatus='Barometer API not exposed by this browser';return}
+ try{
+  const sensor=new SensorType({frequency:1});
+  sensor.addEventListener('reading',()=>{
+   const raw=Number(sensor.pressure);
+   if(!Number.isFinite(raw)||raw<=0)return;
+   // Barometer proposal reports hPa. Some experimental implementations may
+   // expose kPa; normalize plausible kPa readings to hPa.
+   pressure=raw>=20&&raw<=200?raw*10:raw;
+   if(pressure>300&&pressure<1200)pressureStatus='Barometer receiving';
+   else pressureStatus='Pressure reading outside expected atmospheric range';
+  });
+  sensor.addEventListener('error',e=>{pressureStatus='Barometer blocked: '+(e.error?.message||e.error?.name||'unknown error');console.warn('Barometer error',e.error)});
+  sensor.start();pressureSensor=sensor;pressureStatus='Barometer starting';
+ }catch(e){pressureStatus='Barometer unavailable: '+(e.message||e.name);console.warn('Barometer unavailable',e)}
+}
+function startOptionalSensors(){const p=(('Barometer'in window)||('PressureSensor'in window))?'Barometer API exposed; attempting live pressure readings':'Barometer API not exposed by this browser';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: '+(('Magnetometer'in window)?'Magnetometer API available':'waiting for absolute orientation event or Magnetometer API')+'.'}
+async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onAbsoluteOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();startCompassSensors();startPressureSensor();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
 function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,altitudeAccuracy:Number.isFinite(c.altitudeAccuracy)?c.altitudeAccuracy:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
 function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   |   ')}say('Reference captured. The complete 3D mounting orientation is now the reference. Pitch and roll are resolved from the relative quaternion; acceleration axes use the same reference frame. Re-zero after changing the mount. An ATTITUDE ZERO event was added to the log if recording.')}
 function baroAltitudeM(){if(!Number.isFinite(pressure))return null;const qnh=clamp(parseFloat($('qnh').value)||1013.25,850,1100);const pressureAlt=44330*(1-Math.pow(pressure/qnh,0.190294957));return pressureAlt-pressureOffsetM}
 function baroFeet(){const a=baroAltitudeM();return a===null?null:a*3.280839895}
 function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return ['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8]+' · MAG'}
-function current(){const a=transformedAcc(),tilt=getAttitude(),alt=gps&&Number.isFinite(gps.altitude)?gps.altitude*3.280839895:null,altM=gps&&Number.isFinite(gps.altitude)?gps.altitude:null,altAccuracy=gps&&Number.isFinite(gps.altitudeAccuracy)?gps.altitudeAccuracy:null,mag=a?Math.hypot(a.x,a.y,a.z):null;return {a,tilt,alt,altM,altAccuracy,temp:tempC,heading,speed:gps&&gps.speed!==null?gps.speed*1.943844492:null,mag}}
+function current(){const a=transformedAcc(),tilt=getAttitude(),alt=gps&&Number.isFinite(gps.altitude)?gps.altitude*3.280839895:null,altM=gps&&Number.isFinite(gps.altitude)?gps.altitude:null,altAccuracy=gps&&Number.isFinite(gps.altitudeAccuracy)?gps.altitudeAccuracy:null,baroAlt=baroFeet(),baroAltM=baroAltitudeM(),mag=a?Math.hypot(a.x,a.y,a.z):null;return {a,tilt,alt,altM,altAccuracy,baroAlt,baroAltM,temp:tempC,heading,speed:gps&&gps.speed!==null?gps.speed*1.943844492:null,mag}}
 function pushHist(key,t,v){if(v===null||!Number.isFinite(v))return;const ar=history[key];ar.push({t,v});while(ar.length&&t-ar[0].t>KEEP_MS)ar.shift()}
-function sample(){const t=performance.now(),c=current();if(recording&&!paused){if(log.length>=MAX_SAMPLES){stopLog();say('Recording stopped at the 100,000-sample safety limit. Export the CSV before resetting.',true);return}const elapsed=(t-startTime-pausedMs)/1000;const row=[elapsed,c.a?.x??'',c.a?.y??'',c.a?.z??'',c.mag??'',c.tilt?.pitch??'',c.tilt?.roll??'',c.alt??'',c.alt===null?'':c.alt/3.280839895,c.temp??'',c.heading??'',c.speed??'',c.altAccuracy??'',pressure??'',gps?.lat??'',gps?.lon??''];log.push(row);csvBytes+=row.join(',').length+1;if(Number.isFinite(c.mag))peak=Math.max(peak,c.mag)}}
-function updateUi(){const now=performance.now(),c=current(),a=c.a,t=c.tilt;if(now-lastHistorySample>=1000/30){lastHistorySample=now;if(c.a){pushHist('gx',now,c.a.x);pushHist('gy',now,c.a.y);pushHist('gz',now,c.a.z);pushHist('mag',now,c.mag)}if(c.tilt){pushHist('pitch',now,c.tilt.pitch);pushHist('roll',now,c.tilt.roll)}pushHist('alt',now,c.alt);pushHist('temp',now,c.temp);pushHist('compass',now,c.heading)}for(const id of ['carX','flightX'])$(id).textContent=a?n(a.x,3):'—';for(const id of ['carY','flightY'])$(id).textContent=a?n(a.y,3):'—';for(const id of ['carZ','flightZ'])$(id).textContent=a?n(a.z,3):'—';for(const id of ['carMag','flightMag'])$(id).textContent=c.mag!==null?n(c.mag,3):'—';for(const id of ['carPitch','flightPitch'])$(id).textContent=t?n(t.pitch,1)+'° PITCH':'—° PITCH';for(const id of ['carRoll','flightRoll'])$(id).textContent=t?n(t.roll,1)+'° ROLL':'—° ROLL';const ft=c.alt;for(const id of ['carAlt','flightAlt','flightAltLarge'])$(id).textContent=ft===null?'— ft':Math.round(ft).toLocaleString()+' ft';for(const id of ['carAltM','flightAltM','flightAltLargeM'])$(id).textContent=ft===null?'— m':Math.round(ft/3.280839895).toLocaleString()+' m';$('flightAltAccuracy').textContent=c.altAccuracy===null?'GPS vertical accuracy unavailable':'GPS vertical accuracy ±'+Math.round(c.altAccuracy)+' m';for(const id of ['carTemp','flightTemp','flightTempLarge'])$(id).textContent=c.temp===null?'— °C':n(c.temp,1)+' °C';for(const id of ['carTempF','flightTempLargeF'])$(id).textContent=c.temp===null?'Ambient sensor unavailable':n(c.temp*9/5+32,1)+' °F';for(const id of ['carHeading','flightHeading','flightCompass'])$(id).textContent=c.heading===null?'—°':Math.round(c.heading)+'°';$('carCardinal').textContent=cardinal(c.heading);$('flightCardinal').textContent=cardinal(c.heading);$('flightSpeed').textContent=c.speed===null?'—':Math.round(c.speed);$('pfdTemp').textContent=c.temp===null?'OAT --.-°C':'OAT '+n(c.temp,1)+'°C';$('pfdQnh').textContent='QNH '+(parseFloat($('qnh').value)||1013.25).toFixed(0);$('pfdHeading').textContent='HDG '+(c.heading===null?'---':String(Math.round(c.heading)).padStart(3,'0')+'°');$('pfdStatus').textContent=zeroSet?'ATT REF SET':'ATT REF NOT SET';$('sensorAvailability').textContent='Motion: '+(rawAcc?'receiving ('+rawAccKind+')':'waiting')+' · Orientation: '+(orientation?'receiving':'waiting')+' · GPS altitude: '+(gps&&Number.isFinite(gps.altitude)?'receiving':'waiting')+' · Barometer: '+(('PressureSensor'in window)?'API detected':'not exposed to this webpage')+' · Ambient temperature: '+(('AmbientTemperatureSensor'in window)?'API detected':'not exposed to this webpage')+' · Compass: '+(heading===null?'no absolute heading':('active via '+headingSource));drawPfd(t,c);drawAllCharts();if(performance.now()-lastUi>500){lastUi=performance.now();$('sampleCount').textContent=log.length.toLocaleString();$('peakG').textContent=log.length?n(peak,3)+' g':'—';$('fileSize').textContent=(csvBytes/1024).toFixed(1)+' KB';$('elapsed').textContent=recording?timeFmt((performance.now()-startTime-pausedMs-(paused?performance.now()-pauseAt:0))/1000):$('elapsed').textContent;const hz=+$('logRate').value,remaining=(MAX_SAMPLES-log.length)/hz;$('capacity').textContent='100,000-sample cap · '+(remaining/3600).toFixed(2)+' h remaining at '+hz+' Hz · CSV size so far '+(csvBytes/1024).toFixed(1)+' KB. Keep the page visible.'}}
+function sample(){const t=performance.now(),c=current();if(recording&&!paused){if(log.length>=MAX_SAMPLES){stopLog();say('Recording stopped at the 100,000-sample safety limit. Export the CSV before resetting.',true);return}const elapsed=(t-startTime-pausedMs)/1000;const row=[elapsed,c.a?.x??'',c.a?.y??'',c.a?.z??'',c.mag??'',c.tilt?.pitch??'',c.tilt?.roll??'',c.alt??'',c.alt===null?'':c.alt/3.280839895,c.temp??'',c.heading??'',c.speed??'',c.altAccuracy??'',c.baroAlt??'',c.baroAltM??'',pressure??'',gps?.lat??'',gps?.lon??''];log.push(row);csvBytes+=row.join(',').length+1;if(Number.isFinite(c.mag))peak=Math.max(peak,c.mag)}}
+function updateUi(){const now=performance.now(),c=current(),a=c.a,t=c.tilt;if(now-lastHistorySample>=1000/30){lastHistorySample=now;if(c.a){pushHist('gx',now,c.a.x);pushHist('gy',now,c.a.y);pushHist('gz',now,c.a.z);pushHist('mag',now,c.mag)}if(c.tilt){pushHist('pitch',now,c.tilt.pitch);pushHist('roll',now,c.tilt.roll)}pushHist('alt',now,c.alt);pushHist('baroAlt',now,c.baroAlt);pushHist('temp',now,c.temp);pushHist('compass',now,c.heading)}for(const id of ['carX','flightX'])$(id).textContent=a?n(a.x,3):'—';for(const id of ['carY','flightY'])$(id).textContent=a?n(a.y,3):'—';for(const id of ['carZ','flightZ'])$(id).textContent=a?n(a.z,3):'—';for(const id of ['carMag','flightMag'])$(id).textContent=c.mag!==null?n(c.mag,3):'—';for(const id of ['carPitch','flightPitch'])$(id).textContent=t?n(t.pitch,1)+'° PITCH':'—° PITCH';for(const id of ['carRoll','flightRoll'])$(id).textContent=t?n(t.roll,1)+'° ROLL':'—° ROLL';const ft=c.alt;for(const id of ['carAlt','flightAlt','flightAltLarge'])$(id).textContent=ft===null?'— ft':Math.round(ft).toLocaleString()+' ft';for(const id of ['carAltM','flightAltM','flightAltLargeM'])$(id).textContent=ft===null?'— m':Math.round(ft/3.280839895).toLocaleString()+' m';$('flightAltAccuracy').textContent=c.altAccuracy===null?'GPS vertical accuracy unavailable':'GPS vertical accuracy ±'+Math.round(c.altAccuracy)+' m';$('flightBaroAlt').textContent=c.baroAlt===null?'BARO ALT: unavailable · '+pressureStatus:'BARO ALT: '+Math.round(c.baroAlt).toLocaleString()+' ft ('+Math.round(c.baroAltM).toLocaleString()+' m) · '+n(pressure,1)+' hPa';for(const id of ['carTemp','flightTemp','flightTempLarge'])$(id).textContent=c.temp===null?'— °C':n(c.temp,1)+' °C';for(const id of ['carTempF','flightTempLargeF'])$(id).textContent=c.temp===null?'Ambient sensor unavailable':n(c.temp*9/5+32,1)+' °F';for(const id of ['carHeading','flightHeading','flightCompass'])$(id).textContent=c.heading===null?'—°':Math.round(c.heading)+'°';$('carCardinal').textContent=cardinal(c.heading);$('flightCardinal').textContent=cardinal(c.heading);$('flightSpeed').textContent=c.speed===null?'—':Math.round(c.speed);$('pfdTemp').textContent=c.temp===null?'OAT --.-°C':'OAT '+n(c.temp,1)+'°C';$('pfdQnh').textContent='QNH '+(parseFloat($('qnh').value)||1013.25).toFixed(0);$('pfdHeading').textContent='HDG '+(c.heading===null?'---':String(Math.round(c.heading)).padStart(3,'0')+'°');$('pfdStatus').textContent=zeroSet?'ATT REF SET':'ATT REF NOT SET';$('sensorAvailability').textContent='Compass diag: '+compassDiag+' · Magnetometer API: '+(('Magnetometer'in window)?'yes':'no')+' · Motion: '+(rawAcc?'receiving ('+rawAccKind+')':'waiting')+' · Orientation: '+(orientation?'receiving':'waiting')+' · GPS altitude: '+(gps&&Number.isFinite(gps.altitude)?'receiving':'waiting')+' · Barometer API: '+((('Barometer'in window)||('PressureSensor'in window))?'detected':'not exposed')+' · Ambient temperature: '+(('AmbientTemperatureSensor'in window)?'API detected':'not exposed to this webpage')+' · Barometer: '+pressureStatus+' · Compass: '+(heading===null?'waiting ('+headingSource+')':('active via '+headingSource));drawPfd(t,c);drawAllCharts();if(performance.now()-lastUi>500){lastUi=performance.now();$('sampleCount').textContent=log.length.toLocaleString();$('peakG').textContent=log.length?n(peak,3)+' g':'—';$('fileSize').textContent=(csvBytes/1024).toFixed(1)+' KB';$('elapsed').textContent=recording?timeFmt((performance.now()-startTime-pausedMs-(paused?performance.now()-pauseAt:0))/1000):$('elapsed').textContent;const hz=+$('logRate').value,remaining=(MAX_SAMPLES-log.length)/hz;$('capacity').textContent='100,000-sample cap · '+(remaining/3600).toFixed(2)+' h remaining at '+hz+' Hz · CSV size so far '+(csvBytes/1024).toFixed(1)+' KB. Keep the page visible.'}}
 function drawPfd(tilt,c){
  const cv=$('pfd'),ctx=cv.getContext('2d'),w=cv.width,h=cv.height,cx=w/2,cy=h*.47;
  const boxW=w*.54,boxH=h*.66,bx=cx-boxW/2,by=cy-boxH/2;
@@ -361,8 +390,8 @@ function sparkMulti(id,series,unit='°'){
  x.fillText('Time (s)',left+pw/2,h-11);x.save();x.translate(10,top+ph/2);x.rotate(-Math.PI/2);x.fillText(unit,0,0);x.restore();
  for(const [vals,color] of visible){if(vals.length<2)continue;x.strokeStyle=color;x.lineWidth=2;x.beginPath();vals.forEach((p,i)=>{const px=left+(p.t-(now-win))/win*pw,py=y(p.v);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}
 }
-function drawAllCharts(){const css=getComputedStyle(document.documentElement);const c1=css.getPropertyValue('--cyan'),c2=css.getPropertyValue('--green'),c3=css.getPropertyValue('--amber');drawGPlot('flightGChart',[[history.gx,c1],[history.gy,c2],[history.gz,c3]],false,'Acceleration (g)');drawGPlot('flightMagChart',[[history.mag,c3]],true,'Resultant (g)');sparkMulti('flightTiltChart',[[history.pitch,c1],[history.roll,c2]],'Angle (°)');spark('flightAltChart',history.alt,c3,'Altitude (ft)');spark('flightTempChart',history.temp,css.getPropertyValue('--red'),'Temperature (°C)');spark('flightCompassChart',history.compass,c1,'Heading (°)')}
-const csvHeader='elapsed_s,x_g,y_g,z_g,resultant_g,pitch_deg,roll_deg,gps_alt_ft,gps_alt_m,ambient_temp_C,mag_heading_deg,gps_groundspeed_kt,gps_vertical_accuracy_m,pressure_hPa,gps_lat,gps_lon';
+function drawAllCharts(){const css=getComputedStyle(document.documentElement);const c1=css.getPropertyValue('--cyan'),c2=css.getPropertyValue('--green'),c3=css.getPropertyValue('--amber');drawGPlot('flightGChart',[[history.gx,c1],[history.gy,c2],[history.gz,c3]],false,'Acceleration (g)');drawGPlot('flightMagChart',[[history.mag,c3]],true,'Resultant (g)');sparkMulti('flightTiltChart',[[history.pitch,c1],[history.roll,c2]],'Angle (°)');sparkMulti('flightAltChart',[[history.alt,c1],[history.baroAlt,c3]],'Altitude (ft)');spark('flightTempChart',history.temp,css.getPropertyValue('--red'),'Temperature (°C)');spark('flightCompassChart',history.compass,c1,'Heading (°)')}
+const csvHeader='elapsed_s,x_g,y_g,z_g,resultant_g,pitch_deg,roll_deg,gps_alt_ft,gps_alt_m,ambient_temp_C,mag_heading_deg,gps_groundspeed_kt,gps_vertical_accuracy_m,baro_alt_ft,baro_alt_m,pressure_hPa,gps_lat,gps_lon';
 function startLog(){if(!rawAcc){say('No acceleration samples received yet. Enable motion and wait for readings before logging.',true);return}if(recording)return;log=[];events=[];peak=0;csvBytes=csvHeader.length+1;paused=false;recording=true;pausedMs=0;startTime=performance.now();timer=setInterval(sample,1000/(+$('logRate').value));$('recordBtn').disabled=true;$('pauseBtn').disabled=false;$('stopBtn').disabled=false;$('markBtn').disabled=false;$('exportBtn').disabled=false;$('logState').textContent='Recording';$('stickyLogState').textContent='RECORDING';$('events').textContent='No event markers.';say('Recording started. Stay in the foreground; background tabs may suspend sensors.')}
 function pauseLog(){if(!recording)return;if(!paused){paused=true;pauseAt=performance.now();$('pauseBtn').textContent='Resume';$('logState').textContent='Paused';$('stickyLogState').textContent='PAUSED'}else{pausedMs+=performance.now()-pauseAt;paused=false;$('pauseBtn').textContent='Pause';$('logState').textContent='Recording';$('stickyLogState').textContent='RECORDING'}}
 function stopLog(){if(timer)clearInterval(timer);timer=null;recording=false;paused=false;$('recordBtn').disabled=false;$('pauseBtn').disabled=true;$('stopBtn').disabled=true;$('pauseBtn').textContent='Pause';$('markBtn').disabled=true;$('logState').textContent='Stopped';$('stickyLogState').textContent='STOPPED'}
