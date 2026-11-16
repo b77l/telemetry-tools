@@ -123,9 +123,9 @@ const $=id=>document.getElementById(id), G=9.80665, RAD=Math.PI/180, DEG=180/Mat
 const MAX_SAMPLES=100000, KEEP_MS=120000;
 let motionEnabled=false, recording=false, paused=false, log=[], events=[], timer=null;
 let startTime=0, pausedMs=0, pauseAt=0, lastUi=0, lastHistorySample=0, peak=0, csvBytes=0;
-let rawAcc=null, rawAccKind='unknown', orientation=null, zeroQ=null, zeroBaseline=null, zeroSet=false;
+let rawAcc=null, rawAccKind='unknown', rawGravity=null, magField=null, compassSensor=null, compassAccelSensor=null, orientation=null, zeroQ=null, zeroBaseline=null, zeroSet=false;
 let zeroBeta=null, zeroGamma=null, filteredBeta=null, filteredGamma=null, orientationFilterTime=0;
-let pressure=null, pressureOffsetM=0, tempC=null, heading=null, gps=null, gpsWatch=null;
+let pressure=null, pressureOffsetM=0, tempC=null, heading=null, headingIsAbsolute=false, gps=null, gpsWatch=null;
 let genericSensor=null, genericTimer=null, orientationSensor=null, pressureSensor=null;
 const history={gx:[],gy:[],gz:[],mag:[],pitch:[],roll:[],alt:[],temp:[],compass:[]};
 const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.toggle('error',err)};
@@ -163,7 +163,7 @@ function getAttitude(){
 }
 function transformedAcc(){if(!rawAcc)return null;const v={x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G};if(!zeroQ)return {x:v.x,y:-v.y,z:v.z};const q=relQuaternion();if(!q)return null;const r=qRotate(q,v);if(zeroBaseline){r.x-=zeroBaseline.x;r.y-=zeroBaseline.y;r.z-=zeroBaseline.z}/* Body convention: +X right, +Y forward, +Z up. */r.y=-r.y;return r}
 function setRaw(x,y,z,kind){if(![x,y,z].every(Number.isFinite))return;rawAcc={x,y,z};rawAccKind=kind}
-function onMotion(e){const a=e.acceleration;if(a&&[a.x,a.y,a.z].every(Number.isFinite)){setRaw(a.x,a.y,a.z,'linear');return}const b=e.accelerationIncludingGravity;if(b&&[b.x,b.y,b.z].every(Number.isFinite))setRaw(b.x,b.y,b.z,'gravity-inclusive')}
+function onMotion(e){const b=e.accelerationIncludingGravity;if(b&&[b.x,b.y,b.z].every(Number.isFinite)){rawGravity={x:b.x,y:b.y,z:b.z};if(!headingIsAbsolute)updateMagCompass()}const a=e.acceleration;if(a&&[a.x,a.y,a.z].every(Number.isFinite)){setRaw(a.x,a.y,a.z,'linear');return}if(b&&[b.x,b.y,b.z].every(Number.isFinite))setRaw(b.x,b.y,b.z,'gravity-inclusive')}
 function onOrientation(e){
  // Reject incomplete events instead of silently replacing missing axes with zero.
  if(!Number.isFinite(e.beta)||!Number.isFinite(e.gamma)||!Number.isFinite(e.alpha))return;
@@ -180,7 +180,7 @@ function onOrientation(e){
  }
  orientationFilterTime=now;
  orientation={alpha:e.alpha,beta:filteredBeta,gamma:filteredGamma,absolute:!!e.absolute,q:quatFromEuler(e.alpha,filteredBeta,filteredGamma)};
- if(Number.isFinite(e.webkitCompassHeading))heading=(e.webkitCompassHeading+360)%360;else if(e.absolute)heading=(360-e.alpha+360)%360;
+ if(Number.isFinite(e.webkitCompassHeading)){heading=(e.webkitCompassHeading+360)%360;headingIsAbsolute=true}else if(e.absolute){heading=(360-e.alpha+360)%360;headingIsAbsolute=true}else{headingIsAbsolute=false;updateMagCompass()}
 }
 function startGenericFallback(){if(genericSensor)return;try{if('LinearAccelerationSensor'in window){genericSensor=new LinearAccelerationSensor({frequency:30});genericSensor.addEventListener('reading',()=>setRaw(genericSensor.x*G,genericSensor.y*G,genericSensor.z*G,'linear'));genericSensor.addEventListener('error',e=>console.warn('Linear sensor',e.error));genericSensor.start();return}}catch(e){console.warn('Linear sensor unavailable',e)}try{if('Accelerometer'in window){genericSensor=new Accelerometer({frequency:30});genericSensor.addEventListener('reading',()=>setRaw(genericSensor.x*G,genericSensor.y*G,genericSensor.z*G,'gravity-inclusive'));genericSensor.addEventListener('error',e=>console.warn('Accelerometer',e.error));genericSensor.start()}}catch(e){console.warn('Accelerometer unavailable',e)}}
 function startOrientationFallback(){
@@ -202,11 +202,35 @@ function startOrientationFallback(){
   }catch(e){console.warn(name+' unavailable',e)}
  }
 }
-function startOptionalSensors(){const p=('PressureSensor'in window)?'Experimental PressureSensor API detected; reading integration still required':'Barometer hardware confirmed by Samsung diagnostics, but Chrome exposes no standard webpage pressure API';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: device/browser dependent. The Samsung hardware test confirms pressure hardware; this webpage cannot directly call Android SensorManager.'}
-async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
+function startOptionalSensors(){const p=('PressureSensor'in window)?'Experimental PressureSensor API detected; reading integration still required':'Barometer hardware confirmed by Samsung diagnostics, but Chrome exposes no standard webpage pressure API';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: '+(('Magnetometer'in window)?'magnetometer API available':'deviceorientation absolute heading or Magnetometer API required')+'. The Samsung hardware test confirms pressure hardware; this webpage cannot directly call Android SensorManager.'}
+async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();startCompassSensors();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(!rawAcc)startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(!rawAcc)say('No acceleration samples received. Check Chrome site permissions and device sensor support.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
 function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,altitudeAccuracy:Number.isFinite(c.altitudeAccuracy)?c.altitudeAccuracy:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
 function zeroAttitude(){if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;zeroBaseline=rawAcc?{x:rawAcc.x/G,y:rawAcc.y/G,z:rawAcc.z/G}:null;zeroSet=true;$('zeroText').textContent='Reference captured · '+rawAccKind;$('flightZeroText').textContent='Attitude reference captured.';$('pfdStatus').textContent='ATT REF SET';if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   |   ')}say('Reference captured. The complete 3D mounting orientation is now the reference. Pitch and roll are resolved from the relative quaternion; acceleration axes use the same reference frame. Re-zero after changing the mount. An ATTITUDE ZERO event was added to the log if recording.')}
 function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return ['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8]+' · MAG'}
+function updateMagCompass(){
+ // Prefer browser-provided absolute heading when available. Otherwise derive
+ // a tilt-compensated magnetic heading from the Magnetometer + gravity vector.
+ if(!magField||!rawGravity)return;
+ const norm=v=>{const m=Math.hypot(v.x,v.y,v.z);return m>1e-6?{x:v.x/m,y:v.y/m,z:v.z/m}:null};
+ const dot=(a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
+ const cross=(a,b)=>({x:a.y*b.z-a.z*b.y,y:a.z*b.x-a.x*b.z,z:a.x*b.y-a.y*b.x});
+ const up=norm(rawGravity);if(!up)return;
+ const projection=dot(magField,up),north=norm({x:magField.x-projection*up.x,y:magField.y-projection*up.y,z:magField.z-projection*up.z});
+ if(!north)return;const east=norm(cross(up,north));if(!east)return;
+ // Device +Y is the phone's top edge. Project it onto the horizontal plane.
+ const top={x:0,y:1,z:0},v={x:top.x-dot(top,up)*up.x,y:top.y-dot(top,up)*up.y,z:top.z-dot(top,up)*up.z};
+ const hn=dot(v,north),he=dot(v,east);if(Math.hypot(hn,he)<1e-5)return;
+ heading=(Math.atan2(he,hn)*DEG+360)%360;
+}
+function startCompassSensors(){
+ if(!('Magnetometer' in window)||compassSensor)return;
+ try{const S=window.Magnetometer,s=new S({frequency:20,referenceFrame:'device'});
+  s.addEventListener('reading',()=>{magField={x:s.x,y:s.y,z:s.z};if(!headingIsAbsolute)updateMagCompass()});
+  s.addEventListener('error',e=>{console.warn('Magnetometer error',e.error);$('sensorAvailability').textContent='Compass sensor unavailable: '+(e.error?.message||'permission or hardware restriction')});
+  s.start();compassSensor=s;
+ }catch(e){console.warn('Magnetometer unavailable',e)}
+}
+
 function current(){const a=transformedAcc(),tilt=getAttitude(),alt=gps&&Number.isFinite(gps.altitude)?gps.altitude*3.280839895:null,altM=gps&&Number.isFinite(gps.altitude)?gps.altitude:null,mag=a?Math.hypot(a.x,a.y,a.z):null;return {a,tilt,alt,altM,altAccuracy:gps&&Number.isFinite(gps.altitudeAccuracy)?gps.altitudeAccuracy:null,temp:tempC,heading,speed:gps&&gps.speed!==null?gps.speed*1.943844492:null,mag}}
 function pushHist(key,t,v){if(v===null||!Number.isFinite(v))return;const ar=history[key];ar.push({t,v});while(ar.length&&t-ar[0].t>KEEP_MS)ar.shift()}
 function sample(){const t=performance.now(),c=current();if(recording&&!paused){if(log.length>=MAX_SAMPLES){stopLog();say('Recording stopped at the 100,000-sample safety limit. Export the CSV before resetting.',true);return}const elapsed=(t-startTime-pausedMs)/1000;const row=[elapsed,c.a?.x??'',c.a?.y??'',c.a?.z??'',c.mag??'',c.tilt?.pitch??'',c.tilt?.roll??'',c.alt??'',c.alt===null?'':c.alt/3.280839895,c.temp??'',c.heading??'',c.speed??'',c.altAccuracy??'',gps?.lat??'',gps?.lon??''];log.push(row);csvBytes+=row.join(',').length+1;if(Number.isFinite(c.mag))peak=Math.max(peak,c.mag)}}
