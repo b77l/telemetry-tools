@@ -8,15 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#07111e;--panel:#101d2e;--panel2:#17263a;--line:#2a3c54;--fg:#e8f0fb;--muted:#91a5bd;--cyan:#57c7ef;--green:#6bd6a3;--amber:#f3bd65;--red:#ff747d;--blue:#4c9cff}
 :root.light{color-scheme:light;--bg:#edf2f7;--panel:#fff;--panel2:#f1f5fa;--line:#d3deea;--fg:#18283c;--muted:#64758b;--cyan:#087fae;--green:#16865b;--amber:#a86a09;--red:#c63843;--blue:#176dcc}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select{font:inherit}button,select,input{color:var(--fg);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}button{font-weight:650;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#03121d;border-color:transparent}.danger{border-color:#87434b;color:var(--red)}
-header,main,footer{max-width:1050px;margin:auto;padding-left:14px;padding-right:14px}header{padding-top:17px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}.sub{color:var(--muted);font-size:.78rem}.top-actions,.toolbar,.tabs,.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tabs{padding:4px;background:var(--panel);border:1px solid 
-var(--line);border-radius:12px;margin-bottom:12px}.tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:11px}.tabs button.active{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}main{padding-bottom:30px}.view{display:none}.view.active{display:block}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}.panel h2{font-size:.92rem;margin:0 0 
-10px}.muted{color:var(--muted)}.tiny{font-size:.72rem;color:var(--muted)}.status{margin-left:auto;color:var(--muted);font-size:.78rem}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#74849a;margin-right:5px}.dot.on{background:var(--green)}.toolbar{margin-bottom:8px}.toolbar button{padding:8px 10px}.readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.readout{background:var(--panel2);border:1px solid 
-var(--line);border-radius:11px;padding:10px;min-width:0}.readout label{display:block;color:var(--muted);font-size:.7rem}.num{font-size:clamp(1.25rem,4vw,1.85rem);font-weight:760;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{font-size:.72rem;color:var(--muted);margin-left:3px}.cyan{color:var(--cyan)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.instrument{back
-ground:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}.instrument-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.instrument-head b{font-size:.82rem}.instrument .big{font-size:1.5rem;font-weight:750;font-variant-numeric:tabular-nums}.instrument canvas{display:block;width:100%;height:76px}.gauge canvas{height:120px}.pfd-wrap{background:#050a12;border:1px solid 
-#29384b;border-radius:14px;padding:8px;overflow:hidden}.pfd-top{display:flex;justify-content:space-between;align-items:center;color:#7bd78d;font:700 .72rem ui-monospace,monospace;padding:0 5px 6px}.pfd{display:block;width:100%;height:auto;aspect-ratio:1.36;background:#05080e;border-radius:8px}.pfd-bottom{display:flex;justify-content:space-between;gap:8px;color:#a8c1dc;font:700 .72rem ui-monospace,monospace;padding:7px 4px 
-1px}.pfd-readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.pfd-readouts .readout{padding:8px}.pfd-readouts .num{font-size:1.1rem}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 9px}.section-title h2{font-size:1rem;margin:0}.section-title span{font-size:.72rem;color:var(--muted)}.settings{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.settings 
-label{font-size:.78rem;color:var(--muted);display:flex;gap:6px;align-items:center}.settings input{width:90px;padding:7px}.message{min-height:1.2em;color:var(--muted);font-size:.78rem;margin-top:7px}.message.error{color:var(--red)}.event-list{font-size:.76rem;color:var(--muted);max-height:110px;overflow:auto}.scroll-note{text-align:center;color:var(--muted);font-size:.72rem;padding:8px}footer{color:var(--muted);font-size:.72rem;padding-bottom:24px}.hidden{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select{font:inherit}button,select,input{color:var(--fg);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}button{font-weight:650;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#03121d;border-color:transparent}.danger{border-color:#87434b;color:var(--red)}header,main,footer{max-width:1050px;margin:auto;padding-left:14px;padding-right:14px}header{padding-top:17px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}.sub{color:var(--muted);font-size:.78rem}.top-actions,.toolbar,.tabs,.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tabs{padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}.tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:11px}.tabs button.active{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}main{padding-bottom:30px}.view{display:none}.view.active{display:block}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}.panel h2{font-size:.92rem;margin:0 0 10px}.muted{color:var(--muted)}.tiny{font-size:.72rem;color:var(--muted)}.status{margin-left:auto;color:var(--muted);font-size:.78rem}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#74849a;margin-right:5px}.dot.on{background:var(--green)}.toolbar{margin-bottom:8px}.toolbar button{padding:8px 10px}.readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.readout{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;min-width:0}.readout label{display:block;color:var(--muted);font-size:.7rem}.num{font-size:clamp(1.25rem,4vw,1.85rem);font-weight:760;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{font-size:.72rem;color:var(--muted);margin-left:3px}.cyan{color:var(--cyan)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.instrument{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}.instrument-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.instrument-head b{font-size:.82rem}.instrument .big{font-size:1.5rem;font-weight:750;font-variant-numeric:tabular-nums}.instrument canvas{display:block;width:100%;height:76px}.gauge canvas{height:120px}.pfd-wrap{background:#050a12;border:1px solid #29384b;border-radius:14px;padding:8px;overflow:hidden}.pfd-top{display:flex;justify-content:space-between;align-items:center;color:#7bd78d;font:700 .72rem ui-monospace,monospace;padding:0 5px 6px}.pfd{display:block;width:100%;height:auto;aspect-ratio:1.36;background:#05080e;border-radius:8px}.pfd-bottom{display:flex;justify-content:space-between;gap:8px;color:#a8c1dc;font:700 .72rem ui-monospace,monospace;padding:7px 4px 1px}.pfd-readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.pfd-readouts .readout{padding:8px}.pfd-readouts .num{font-size:1.1rem}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 9px}.section-title h2{font-size:1rem;margin:0}.section-title span{font-size:.72rem;color:var(--muted)}.settings{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.settings label{font-size:.78rem;color:var(--muted);display:flex;gap:6px;align-items:center}.settings input{width:90px;padding:7px}.message{min-height:1.2em;color:var(--muted);font-size:.78rem;margin-top:7px}.message.error{color:var(--red)}.event-list{font-size:.76rem;color:var(--muted);max-height:110px;overflow:auto}.scroll-note{text-align:center;color:var(--muted);font-size:.72rem;padding:8px}footer{color:var(--muted);font-size:.72rem;padding-bottom:24px}.hidden{display:none!important}
 @media(max-width:600px){header{padding-top:12px}.readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.pfd-readouts{grid-template-columns:repeat(2,1fr)}.status{width:100%;margin-left:0}.tabs button{font-size:.85rem}}
 
 /* Dedicated FLIGHT build: one mode, no mode switcher. */
@@ -33,3 +25,473 @@ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
 </head>
 <body>
 <header><div><div class="brand">TELEMETRY <span style="color:var(--cyan)">/</span> FLIGHT</div><div class="sub">Flight instrumentation · GPS / attitude / G history</div></div><div class="top-actions"><button id="themeBtn" aria-label="Toggle theme">☼ / ☾</button></div></header>
+<main>
+
+ <section class="panel">
+  <div class="toolbar">
+   <button class="primary" id="enableBtn">Enable motion</button><button id="gpsBtn">Enable GPS</button>
+   <button id="exportBtn" disabled>Export CSV</button><button class="danger" id="resetBtn">Reset</button>
+   <span class="status"><i class="dot" id="motionDot"></i><span id="statusText">Sensors not enabled</span></span>
+  </div>
+  <div class="message" id="message">Open directly in Chrome or Safari over HTTPS. Allow motion and location access when prompted.</div>
+ </section>
+
+ <section class="view active" id="carView">
+  <div class="panel">
+   <div class="section-title"><h2>CAR · Live telemetry</h2><span>Fixed phone-mount axes · align phone with vehicle</span></div>
+   <div class="readouts">
+    <div class="readout"><label>LONGITUDINAL · +FORWARD</label><div class="num cyan" id="carX">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>LATERAL · +RIGHT</label><div class="num green" id="carY">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>VERTICAL · +UP</label><div class="num amber" id="carZ">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>RESULTANT</label><div class="num" id="carMag">—</div><span class="unit">g</span></div>
+   </div>
+   <div class="toolbar" style="margin-top:10px;margin-bottom:0"><button id="zeroBtn">Capture reference</button><span class="tiny" id="zeroText">Zero reference not set</span></div>
+  </div>
+  <div class="grid2">
+   <div class="instrument"><div class="instrument-head"><b>INCLINOMETER</b><span class="tiny">relative to zero</span></div><div class="big cyan" id="carPitch">—°</div><div class="tiny">Pitch</div><div class="big green" id="carRoll">—°</div><div class="tiny">Roll</div><canvas id="carTiltChart"></canvas></div>
+   <div class="instrument"><div class="instrument-head"><b>BAROMETRIC ALTIMETER</b><span class="tiny">barometer required</span></div><div class="big amber" id="carAlt">— ft</div><div class="tiny" id="carAltM">— m</div><canvas id="carAltChart"></canvas></div>
+   <div class="instrument"><div class="instrument-head"><b>TEMPERATURE</b><span class="tiny">external sensor required</span></div><div class="big" id="carTemp">— °C</div><div class="tiny" id="carTempF">— °F</div><canvas id="carTempChart"></canvas></div>
+   <div class="instrument"><div class="instrument-head"><b>COMPASS</b><span class="tiny">magnetic heading</span></div><div class="big cyan" id="carHeading">—°</div><div class="tiny" id="carCardinal">Heading unavailable</div><canvas id="carCompassChart"></canvas></div>
+  </div>
+  <div class="panel"><div class="section-title"><h2>G METERS</h2><span>fixed vehicle axes · linear acceleration</span></div><div class="grid2"><div class="instrument gauge"><b>3-axis acceleration · g <span class="tiny">LONG / LAT / VERT</span></b><canvas id="carGChart"></canvas></div><div class="instrument gauge"><b>Resultant magnitude · g</b><canvas id="carMagChart"></canvas></div></div></div>
+ </section>
+
+ <section class="view active" id="flightView">
+  <div class="panel">
+   <div class="section-title"><h2>FLIGHT · PRIMARY FLIGHT DISPLAY</h2><span>PHONE ATTITUDE REFERENCE</span></div>
+   <div class="pfd-wrap">
+    <div class="pfd-top"><span id="pfdTemp">OAT --.-°C</span><span>ATTITUDE / GPS GS / GPS ALT</span><span id="pfdQnh">QNH 1013</span></div>
+    <canvas id="pfd" class="pfd" width="900" height="660" aria-label="Boeing-inspired primary flight display"></canvas>
+    <div class="pfd-bottom"><span id="pfdHeading">HDG ---°</span><span id="pfdStatus">ATT REF NOT SET</span><span>GPS GROUNDSPEED</span></div>
+   </div>
+   <div class="pfd-readouts">
+    <div class="readout"><label>GROUND SPEED</label><div class="num cyan" id="flightSpeed">—</div><span class="unit">KTS GPS</span></div>
+    <div class="readout"><label>GPS ALTITUDE</label><div class="num amber" id="flightAlt">—</div><span class="unit" id="flightAltM">— m</span></div>
+    <div class="readout"><label>HEADING</label><div class="num" id="flightHeading">—°</div><span class="unit">MAG</span></div>
+    <div class="readout"><label>OUTSIDE TEMP</label><div class="num green" id="flightTemp">—</div><span class="unit">°C</span></div>
+   </div>
+   <div class="toolbar" style="margin-top:10px;margin-bottom:0"><button id="flightZeroBtn">Capture mount & attitude reference</button><span class="tiny" id="flightZeroText">Park on level ground. Mount rigidly: phone top edge forward, screen up. Then capture.</span></div>
+  </div>
+  <div class="scroll-note">↓ SCROLL FOR FLIGHT G METERS & TELEMETRY ↓</div>
+  <div class="panel">
+   <div class="section-title"><h2>FLIGHT · G METERS</h2><span>Fixed vehicle axes · linear acceleration only</span></div>
+   <div class="readouts">
+    <div class="readout"><label>LONGITUDINAL · +FORWARD</label><div class="num cyan" id="flightX">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>LATERAL · +RIGHT</label><div class="num green" id="flightY">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>VERTICAL · +UP</label><div class="num amber" id="flightZ">—</div><span class="unit">g</span></div>
+    <div class="readout"><label>RESULTANT</label><div class="num" id="flightMag">—</div><span class="unit">g</span></div>
+   </div>
+   <div class="grid2" style="margin-top:10px"><div class="instrument gauge"><b>3-axis acceleration · g <span class="tiny">LONG / LAT / VERT</span></b><canvas id="flightGChart"></canvas></div><div class="instrument gauge"><b>Resultant magnitude · g</b><canvas id="flightMagChart"></canvas></div></div>
+  </div>
+  <div class="grid2">
+   <div class="instrument"><b>INCLINOMETER · RELATIVE ATTITUDE</b><div class="big cyan" id="flightPitch">—° PITCH</div><div class="big green" id="flightRoll">—° ROLL</div><canvas id="flightTiltChart"></canvas></div>
+   <div class="instrument"><b>ALTIMETER · GPS + BARO</b><div class="big amber" id="flightAltLarge">— ft</div><div class="tiny" id="flightAltLargeM">— m</div><div class="tiny" id="flightAltAccuracy">GPS vertical accuracy unavailable</div><div class="tiny" id="flightBaroAlt">BARO ALT: waiting for pressure sensor</div><div class="tiny">GRAPH: GPS altitude (cyan) · barometric altitude (amber)</div><canvas id="flightAltChart"></canvas></div>
+   <div class="instrument"><b>TEMPERATURE</b><div class="big" id="flightTempLarge">— °C</div><div class="tiny" id="flightTempLargeF">— °F</div><canvas id="flightTempChart"></canvas></div>
+   <div class="instrument"><b>COMPASS</b><div class="big cyan" id="flightCompass">—°</div><div class="tiny" id="flightCardinal">Heading unavailable</div><canvas id="flightCompassChart"></canvas></div>
+  </div>
+ </section>
+
+ <section class="panel">
+  <div class="section-title"><h2>RECORDING & CALIBRATION</h2><span>CSV data log</span></div>
+  <div class="settings">
+   <label>QNH (hPa) <input id="qnh" type="number" min="850" max="1100" step=".1" value="1013.25"></label>
+   <label>Graph window <select id="window"><option value="30">30 s</option><option value="60" selected>60 s</option></select></label>
+   <label>Log rate <select id="logRate"><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select></label>
+  </div>
+  <div class="tiny" id="sensorAvailability" style="margin-top:9px">Sensor availability will appear here after enabling sensors.</div>
+  <div class="tiny" style="margin-top:8px">Attitude reference sets pitch/roll zero only; it does not rotate the G axes. For vehicle G, mount the phone rigidly with its top edge forward and screen facing upward: device +Y is forward, +X is right, and +Z is up. GPS altitude is displayed in the flight tape; the QNH setting is retained as a reference for a future supported barometric feed and is not applied to GPS altitude. Your Samsung diagnostic confirms a physical barometer, but Chrome does not expose Android SensorManager to a normal webpage. Ambient temperature is a separate sensor and was not shown in the supplied diagnostic. This build will not fake either value. Compass remains magnetic heading.</div>
+ </section>
+ <section class="panel"><div class="section-title"><h2>SESSION</h2><span id="logState">Not recording</span></div><div class="readouts"><div class="readout"><label>ELAPSED</label><div class="num" id="elapsed">00:00</div></div><div class="readout"><label>LOG SAMPLES</label><div class="num" id="sampleCount">0</div></div><div class="readout"><label>PEAK RESULTANT</label><div class="num amber" id="peakG">—</div></div><div class="readout"><label>EST. CSV SIZE</label><div class="num" id="fileSize">0 KB</div></div></div><div class="event-list" id="events" style="margin-top:8px">No event markers.</div><div class="tiny" id="capacity" style="margin-top:7px">Recording capacity: up to 100,000 samples. At 10 Hz that is about 2 h 47 min. Keep the page visible during recording.</div></section>
+</main>
+<nav class="sticky-logbar" aria-label="Recording controls">
+ <div class="sticky-logbar-inner">
+  <span class="sticky-state" id="stickyLogState">NOT RECORDING</span>
+  <button class="primary" id="recordBtn" disabled>Start log</button>
+  <button id="pauseBtn" disabled>Pause</button>
+  <button class="danger" id="stopBtn" disabled>End</button>
+  <button id="markBtn" disabled>Mark</button>
+ </div>
+</nav>
+<footer>Experimental phone telemetry only. Vehicle G assumes a rigid mount with phone top edge forward and screen facing up: device +Y maps forward, +X maps right, +Z maps up. The app uses gravity-free linear acceleration only; gravity-inclusive data are not shown as vehicle G. GPS groundspeed is not indicated airspeed. Phone-derived attitude, compass, GPS altitude and temperature are not certified instruments and must never be used for flight or vehicle safety decisions. Sensor support varies by device and browser.</footer>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id), G=9.80665, RAD=Math.PI/180, DEG=180/Math.PI;
+const MAX_SAMPLES=100000, KEEP_MS=120000;
+let motionEnabled=false, recording=false, paused=false, log=[], events=[], timer=null;
+let startTime=0, pausedMs=0, pauseAt=0, lastUi=0, lastHistorySample=0, peak=0, csvBytes=0;
+let rawAcc=null, rawAccKind='unavailable', rawAccTime=0, linearAccWindow=[], orientation=null, zeroQ=null, zeroBaseline=null, zeroSet=false, gravityFeedSeen=false;
+let rawGravity=null, magField=null, compassSensor=null, headingIsAbsolute=false, headingSource='waiting for absolute heading', compassDiag='no orientation event yet', orientationEventCount=0, absoluteEventCount=0;
+let zeroBeta=null, zeroGamma=null, filteredBeta=null, filteredGamma=null, orientationFilterTime=0, attitudeSource='waiting';
+let pressure=null, pressureOffsetM=0, pressureStatus='not started', tempC=null, heading=null, gps=null, gpsWatch=null;
+let genericSensor=null, genericTimer=null, orientationSensor=null, pressureSensor=null;
+const history={gx:[],gy:[],gz:[],mag:[],pitch:[],roll:[],alt:[],baroAlt:[],temp:[],compass:[]};
+const say=(s,err=false)=>{$('message').textContent=s;$('message').classList.toggle('error',err)};
+const n=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'—';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const timeFmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+function quatFromEuler(alpha,beta,gamma){const a=alpha*RAD/2,b=beta*RAD/2,g=gamma*RAD/2,cA=Math.cos(a),sA=Math.sin(a),cB=Math.cos(b),sB=Math.sin(b),cG=Math.cos(g),sG=Math.sin(g);return {w:cA*cB*cG-sA*sB*sG,x:cA*sB*cG-sA*cB*sG,y:cA*cB*sG+sA*sB*cG,z:sA*cB*cG+cA*sB*sG}}
+function qConj(q){return {w:q.w,x:-q.x,y:-q.y,z:-q.z}}
+function qMul(a,b){return {w:a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z,x:a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y,y:a.w*b.y-a.x*b.z+a.y*b.w+a.z*b.x,z:a.w*b.z+a.x*b.y-a.y*b.x+a.z*b.w}}
+function qRotate(q,v){const p={w:0,x:v.x,y:v.y,z:v.z},r=qMul(qMul(q,p),qConj(q));return {x:r.x,y:r.y,z:r.z}}
+function wrap180(a){return ((a+180)%360+360)%360-180}
+function orientationQuaternion(){if(!orientation)return null;return orientation.q||quatFromEuler(orientation.alpha,orientation.beta,orientation.gamma)}
+function relQuaternion(){
+ // Mount-tilt removal. q = Rz(alpha)*Rx(beta)*Ry(gamma) maps device -> earth, and the
+ // zero reference is a rotation fixed in the DEVICE frame (the cradle angle), so it must
+ // be removed on the RIGHT: q_rel = q * conj(T0). The old conj(q0)*q applied it on the
+ // earth side, which sandwiched the heading rotation Rz(dAlpha) between two tilts and
+ // leaked heading change into pitch/roll. Here Rz stays leftmost, so gravity (row 2 of
+ // the matrix) is independent of heading.
+ const q=orientationQuaternion();if(!q)return null;return zeroQ?qMul(q,qConj(zeroQ)):q}
+function extractZXY(q){
+ // DeviceOrientation's intrinsic Z-X'-Y'' convention is represented by
+ // q = qZ(alpha) * qX(beta) * qY(gamma). Extract the relative rotation
+ // as a complete Euler solution; do not subtract beta/gamma independently.
+ const m=Math.hypot(q.w,q.x,q.y,q.z);
+ if(!Number.isFinite(m)||m<1e-9)return null;
+ const w=q.w/m,x=q.x/m,y=q.y/m,z=q.z/m;
+ const r21=2*(x*w+y*z);
+ const pitch=Math.asin(clamp(r21,-1,1))*DEG;
+ const r20=2*(x*z-w*y);
+ const r22=1-2*(x*x+y*y);
+ const roll=Math.atan2(-r20,r22)*DEG;
+ return {pitch,roll};
+}
+function getAttitude(){
+ if(!orientation)return null;
+ const q=relQuaternion();
+ if(!q)return null;
+ const angles=extractZXY(q);
+ if(!angles)return null;
+ return {pitch:angles.pitch,roll:angles.roll,q};
+}
+function transformedAcc(){
+ // DeviceMotion acceleration is already expressed in the phone's own axes.
+ // With a rigid, aligned mount (top edge forward, screen up):
+ // device +Y = vehicle forward, +X = vehicle right, +Z = vehicle up.
+ // The phone rotates WITH the car, so applying the changing world-attitude
+ // quaternion here would incorrectly rotate body acceleration during turns.
+ // Only gravity-free linear acceleration is valid for vehicle G.
+ if(!rawAcc||rawAccKind!=='linear'||performance.now()-rawAccTime>1000)return null;
+ const bx=zeroBaseline?zeroBaseline.x:0, by=zeroBaseline?zeroBaseline.y:0, bz=zeroBaseline?zeroBaseline.z:0;
+ return {x:(rawAcc.y-by)/G, y:(rawAcc.x-bx)/G, z:(rawAcc.z-bz)/G};
+}
+function setRaw(x,y,z,kind){
+ if(![x,y,z].every(Number.isFinite))return;
+ rawAcc={x,y,z};rawAccKind=kind;rawAccTime=performance.now();
+ if(kind==='linear'){
+  linearAccWindow.push({t:rawAccTime,x,y,z});
+  while(linearAccWindow.length>0&&(rawAccTime-linearAccWindow[0].t>2500||linearAccWindow.length>150))linearAccWindow.shift();
+ }
+}
+function onMotion(e){
+ const b=e.accelerationIncludingGravity;
+ if(b&&[b.x,b.y,b.z].every(Number.isFinite)){
+  rawGravity={x:b.x,y:b.y,z:b.z};gravityFeedSeen=true;
+  if(!headingIsAbsolute)updateMagCompass();
+ }
+ const a=e.acceleration;
+ if(a&&[a.x,a.y,a.z].every(Number.isFinite)){setRaw(a.x,a.y,a.z,'linear');return}
+ // Do not substitute gravity-inclusive acceleration for vehicle G. It is
+ // retained separately for compass support, but never presented as linear G.
+}
+function onOrientation(e){
+ // Accept both deviceorientation and deviceorientationabsolute. Absolute
+ // readings take priority; relative events must never erase a valid heading.
+ if(!Number.isFinite(e.beta)||!Number.isFinite(e.gamma)||!Number.isFinite(e.alpha))return;
+ const absolute=!!e.absolute||e.__forceAbsolute===true;orientationEventCount++;if(absolute)absoluteEventCount++;compassDiag=(e.__forceAbsolute?'absolute event':(absolute?'absolute orientation':'relative orientation'))+' · α '+e.alpha.toFixed(1)+'° · events '+orientationEventCount+'/'+absoluteEventCount+' abs';
+ const now=performance.now(),dt=orientationFilterTime?clamp((now-orientationFilterTime)/1000,.005,.25):.05;
+ const maxStep=180*dt;
+ if(filteredBeta===null||filteredGamma===null){filteredBeta=e.beta;filteredGamma=e.gamma}
+ else{
+  const db=wrap180(e.beta-filteredBeta),dg=wrap180(e.gamma-filteredGamma);
+  const targetBeta=wrap180(filteredBeta+clamp(db,-maxStep,maxStep));
+  const targetGamma=wrap180(filteredGamma+clamp(dg,-maxStep,maxStep));
+  const alphaFilter=1-Math.exp(-dt/.12);
+  filteredBeta=wrap180(filteredBeta+wrap180(targetBeta-filteredBeta)*alphaFilter);
+  filteredGamma=wrap180(filteredGamma+wrap180(targetGamma-filteredGamma)*alphaFilter);
+ }
+ orientationFilterTime=now;
+ // Attitude is deliberately sourced from the standard deviceorientation
+ // stream only. The separate deviceorientationabsolute stream is used for
+ // compass heading below; mixing its Euler angles into the attitude
+ // quaternion can introduce frame discontinuities on some Android builds.
+ attitudeSource='deviceorientation';
+ if(orientationSensor){try{orientationSensor.stop()}catch(_){}orientationSensor=null;}
+ orientation={alpha:e.alpha,beta:filteredBeta,gamma:filteredGamma,absolute,q:quatFromEuler(e.alpha,filteredBeta,filteredGamma)};
+ if(Number.isFinite(e.webkitCompassHeading)){compassDiag+=' · webkit heading '+e.webkitCompassHeading.toFixed(1)+'°';
+  heading=(e.webkitCompassHeading+360)%360;headingIsAbsolute=true;headingSource='webkitCompassHeading';
+ }else if(absolute){
+  heading=((360-e.alpha)%360+360)%360;headingIsAbsolute=true;headingSource='deviceorientation absolute';
+ }else if(!headingIsAbsolute){
+  headingSource='waiting for absolute heading';
+  updateMagCompass();
+ }
+}
+function onAbsoluteOrientation(e){
+ // Compass-only path: never feed this event's beta/gamma into the attitude
+ // solution. Some browsers dispatch this stream with a different reference
+ // frame from the standard DeviceOrientationEvent stream.
+ if(!Number.isFinite(e.alpha))return;
+ absoluteEventCount++;
+ compassDiag='absolute compass-only event · α '+e.alpha.toFixed(1)+'° · abs events '+absoluteEventCount;
+ if(!headingIsAbsolute || headingSource!=='webkitCompassHeading'){
+  heading=((360-e.alpha)%360+360)%360;
+  headingIsAbsolute=true;
+  headingSource='deviceorientationabsolute';
+ }
+}
+
+function startGenericFallback(){
+ if(genericSensor||rawAccKind==='linear')return;
+ if(!('LinearAccelerationSensor'in window))return;
+ try{
+  genericSensor=new LinearAccelerationSensor({frequency:30,referenceFrame:'device'});
+  // Generic Sensor values are already in m/s^2; do not multiply by g.
+  genericSensor.addEventListener('reading',()=>setRaw(genericSensor.x,genericSensor.y,genericSensor.z,'linear'));
+  genericSensor.addEventListener('error',e=>{console.warn('Linear sensor',e.error);genericSensor=null});
+  genericSensor.start();
+ }catch(e){console.warn('Linear sensor unavailable',e);genericSensor=null}
+}
+function startOrientationFallback(){
+ if(orientationSensor)return;
+ const Types=['AbsoluteOrientationSensor','RelativeOrientationSensor'];
+ for(const name of Types){
+  if(!(name in window))continue;
+  try{
+   const Sensor=window[name],sensor=new Sensor({frequency:60,referenceFrame:'device'});
+   sensor.addEventListener('reading',()=>{
+    if(attitudeSource==='deviceorientation')return;
+    const q=sensor.quaternion;
+    if(!q||q.length!==4)return;
+    {const qq={x:q[0],y:q[1],z:q[2],w:q[3]};const beta=Math.asin(clamp(2*(qq.w*qq.x-qq.y*qq.z),-1,1))*DEG;const gamma=Math.atan2(2*(qq.w*qq.y+qq.x*qq.z),1-2*(qq.y*qq.y+qq.z*qq.z))*DEG;orientation={q:qq,alpha:0,beta,gamma,absolute:name==='AbsoluteOrientationSensor'};attitudeSource=name;}
+   });
+   sensor.addEventListener('error',e=>console.warn(name+' error',e.error));
+   sensor.start();orientationSensor=sensor;
+   $('sensorAvailability').dataset.orientationApi=name;
+   return;
+  }catch(e){console.warn(name+' unavailable',e)}
+ }
+}
+function updateMagCompass(){
+ // Prefer browser-provided absolute heading when available. Otherwise derive
+ // a tilt-compensated magnetic heading from the Magnetometer + gravity vector.
+ if(!magField||!rawGravity)return;
+ const norm=v=>{const m=Math.hypot(v.x,v.y,v.z);return m>1e-6?{x:v.x/m,y:v.y/m,z:v.z/m}:null};
+ const dot=(a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
+ const cross=(a,b)=>({x:a.y*b.z-a.z*b.y,y:a.z*b.x-a.x*b.z,z:a.x*b.y-a.y*b.x});
+ const up=norm(rawGravity);if(!up)return;
+ const projection=dot(magField,up),north=norm({x:magField.x-projection*up.x,y:magField.y-projection*up.y,z:magField.z-projection*up.z});
+ if(!north)return;const east=norm(cross(up,north));if(!east)return;
+ // Device +Y is the phone's top edge. Project it onto the horizontal plane.
+ const top={x:0,y:1,z:0},v={x:top.x-dot(top,up)*up.x,y:top.y-dot(top,up)*up.y,z:top.z-dot(top,up)*up.z};
+ const hn=dot(v,north),he=dot(v,east);if(Math.hypot(hn,he)<1e-5)return;
+ heading=(Math.atan2(he,hn)*DEG+360)%360;
+}
+function startCompassSensors(){
+ if(!('Magnetometer' in window)){headingSource='waiting for deviceorientationabsolute';return}
+ if(compassSensor)return;
+ try{const S=window.Magnetometer,s=new S({frequency:20,referenceFrame:'device'});
+  s.addEventListener('reading',()=>{magField={x:s.x,y:s.y,z:s.z};if(!headingIsAbsolute){headingSource='magnetometer';compassDiag='magnetometer + gravity';updateMagCompass()}});
+  s.addEventListener('error',e=>{console.warn('Magnetometer error',e.error);headingSource='magnetometer blocked';$('sensorAvailability').textContent='Compass sensor unavailable: '+(e.error?.message||'permission or hardware restriction')+'; waiting for deviceorientationabsolute'});
+  s.start();compassSensor=s;
+ }catch(e){console.warn('Magnetometer unavailable',e)}
+}
+
+function startPressureSensor(){
+ if(pressureSensor)return;
+ // The proposed ambient barometer API is named Barometer. Keep the earlier
+ // PressureSensor name as a defensive experimental alias, but never fake data.
+ const SensorType=('Barometer' in window)?window.Barometer:(('PressureSensor' in window)?window.PressureSensor:null);
+ if(!SensorType){pressureStatus='Barometer API not exposed by this browser';return}
+ try{
+  const sensor=new SensorType({frequency:1});
+  sensor.addEventListener('reading',()=>{
+   const raw=Number(sensor.pressure);
+   if(!Number.isFinite(raw)||raw<=0)return;
+   // Barometer proposal reports hPa. Some experimental implementations may
+   // expose kPa; normalize plausible kPa readings to hPa.
+   pressure=raw>=20&&raw<=200?raw*10:raw;
+   if(pressure>300&&pressure<1200)pressureStatus='Barometer receiving';
+   else pressureStatus='Pressure reading outside expected atmospheric range';
+  });
+  sensor.addEventListener('error',e=>{pressureStatus='Barometer blocked: '+(e.error?.message||e.error?.name||'unknown error');console.warn('Barometer error',e.error)});
+  sensor.start();pressureSensor=sensor;pressureStatus='Barometer starting';
+ }catch(e){pressureStatus='Barometer unavailable: '+(e.message||e.name);console.warn('Barometer unavailable',e)}
+}
+function startOptionalSensors(){const p=(('Barometer'in window)||('PressureSensor'in window))?'Barometer API exposed; attempting live pressure readings':'Barometer API not exposed by this browser';const t=('AmbientTemperatureSensor'in window)?'AmbientTemperatureSensor API exposed':'No standard webpage ambient-temperature API';$('sensorAvailability').textContent=p+' · '+t+' · Compass: '+(('Magnetometer'in window)?'Magnetometer API available':'waiting for absolute orientation event or Magnetometer API')+'.'}
+async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensors require HTTPS. Open the GitHub Pages URL directly.');if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')throw Error('Motion permission was not granted.')}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')throw Error('Orientation permission was not granted.')}window.addEventListener('devicemotion',onMotion);window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onAbsoluteOrientation);motionEnabled=true;$('motionDot').classList.add('on');$('statusText').textContent='Motion listeners active';$('recordBtn').disabled=false;startOptionalSensors();startCompassSensors();startPressureSensor();if(genericTimer)clearTimeout(genericTimer);genericTimer=setTimeout(()=>{if(rawAccKind!=='linear')startGenericFallback();if(!orientation)startOrientationFallback()},1800);say('Motion and orientation listeners enabled. Waiting for sensor readings; keep the page in the foreground.');setTimeout(()=>{if(rawAccKind!=='linear')say('No gravity-free linear acceleration feed is available. Vehicle G meters are disabled; attitude/GPS can still work.',true);else if(!orientation)say('Acceleration is arriving, but orientation is unavailable. G logging works; attitude/PFD zeroing needs orientation access.',true)},4000)}catch(e){say(e.message||'Unable to enable sensors.',true)}}
+function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,altitudeAccuracy:Number.isFinite(c.altitudeAccuracy)?c.altitudeAccuracy:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
+function zeroAttitude(){
+ if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}
+ zeroQ=quatFromEuler(0,orientation.beta,orientation.gamma);zeroBeta=orientation.beta;zeroGamma=orientation.gamma;
+ zeroBaseline=null;
+ let baselineNote='G bias baseline not captured';
+ if(rawAccKind==='linear'&&performance.now()-rawAccTime<1000){
+  const now=performance.now(),recent=linearAccWindow.filter(p=>now-p.t<=1500);
+  if(recent.length>=8&&recent[recent.length-1].t-recent[0].t>=500){
+   const mean={x:0,y:0,z:0};
+   for(const p of recent){mean.x+=p.x;mean.y+=p.y;mean.z+=p.z}
+   mean.x/=recent.length;mean.y/=recent.length;mean.z/=recent.length;
+   const variance={x:0,y:0,z:0};
+   for(const p of recent){variance.x+=(p.x-mean.x)**2;variance.y+=(p.y-mean.y)**2;variance.z+=(p.z-mean.z)**2}
+   const maxStd=Math.sqrt(Math.max(variance.x,variance.y,variance.z)/recent.length)/G;
+   if(maxStd<=0.03){zeroBaseline=mean;baselineNote='stationary linear-G bias averaged from '+recent.length+' samples'}
+   else baselineNote='G bias not zeroed · sensor not sufficiently steady';
+  }else baselineNote='G bias not zeroed · collect at least 0.5 s of stationary samples';
+ }
+ zeroSet=true;
+ $('zeroText').textContent='Attitude reference captured · '+(zeroBaseline?'linear-G bias averaged':'no G bias correction');
+ $('flightZeroText').textContent=rawAccKind==='linear'
+  ?'Reference captured · fixed mount axes active · '+baselineNote+'.'
+  :'Attitude reference captured · vehicle G unavailable (browser has not supplied gravity-free linear acceleration).';
+ $('pfdStatus').textContent='ATT REF SET';
+ if(recording&&!paused){const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'ATTITUDE / G ZERO'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   | ')}
+ say(rawAccKind==='linear'
+  ?'Reference captured. Pitch/roll retain their relative quaternion reference. Vehicle G now uses fixed phone-mount axes: +forward, +right, +up. The changing attitude quaternion is deliberately NOT applied to acceleration. Keep the phone rigidly mounted with its top edge forward and screen up.'
+  :'Attitude reference captured, but vehicle G is unavailable because this browser is not providing gravity-free linear acceleration. Gravity-inclusive readings are deliberately excluded to avoid false braking/cornering G.');
+}
+function baroAltitudeM(){if(!Number.isFinite(pressure))return null;const qnh=clamp(parseFloat($('qnh').value)||1013.25,850,1100);const pressureAlt=44330*(1-Math.pow(pressure/qnh,0.190294957));return pressureAlt-pressureOffsetM}
+function baroFeet(){const a=baroAltitudeM();return a===null?null:a*3.280839895}
+function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return ['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8]+' · MAG'}
+function current(){const a=transformedAcc(),tilt=getAttitude(),alt=gps&&Number.isFinite(gps.altitude)?gps.altitude*3.280839895:null,altM=gps&&Number.isFinite(gps.altitude)?gps.altitude:null,altAccuracy=gps&&Number.isFinite(gps.altitudeAccuracy)?gps.altitudeAccuracy:null,baroAlt=baroFeet(),baroAltM=baroAltitudeM(),mag=a?Math.hypot(a.x,a.y,a.z):null;return {a,tilt,alt,altM,altAccuracy,baroAlt,baroAltM,temp:tempC,heading,speed:gps&&gps.speed!==null?gps.speed*1.943844492:null,mag}}
+function pushHist(key,t,v){if(v===null||!Number.isFinite(v))return;const ar=history[key];ar.push({t,v});while(ar.length&&t-ar[0].t>KEEP_MS)ar.shift()}
+function sample(){const t=performance.now(),c=current();if(recording&&!paused){if(log.length>=MAX_SAMPLES){stopLog();say('Recording stopped at the 100,000-sample safety limit. Export the CSV before resetting.',true);return}const elapsed=(t-startTime-pausedMs)/1000;const row=[elapsed,c.a?.x??'',c.a?.y??'',c.a?.z??'',c.mag??'',c.tilt?.pitch??'',c.tilt?.roll??'',c.alt??'',c.alt===null?'':c.alt/3.280839895,c.temp??'',c.heading??'',c.speed??'',c.altAccuracy??'',c.baroAlt??'',c.baroAltM??'',pressure??'',gps?.lat??'',gps?.lon??'',(rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?'linear':'unavailable'),rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.x/G:'',rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.y/G:'',rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.z/G:''];log.push(row);csvBytes+=row.join(',').length+1;if(Number.isFinite(c.mag))peak=Math.max(peak,c.mag)}}
+function updateUi(){const now=performance.now(),c=current(),a=c.a,t=c.tilt;if(now-lastHistorySample>=1000/30){lastHistorySample=now;if(c.a){pushHist('gx',now,c.a.x);pushHist('gy',now,c.a.y);pushHist('gz',now,c.a.z);pushHist('mag',now,c.mag)}if(c.tilt){pushHist('pitch',now,c.tilt.pitch);pushHist('roll',now,c.tilt.roll)}pushHist('alt',now,c.alt);pushHist('baroAlt',now,c.baroAlt);pushHist('temp',now,c.temp);pushHist('compass',now,c.heading)}for(const id of ['carX','flightX'])$(id).textContent=a?n(a.x,3):'—';for(const id of ['carY','flightY'])$(id).textContent=a?n(a.y,3):'—';for(const id of ['carZ','flightZ'])$(id).textContent=a?n(a.z,3):'—';for(const id of ['carMag','flightMag'])$(id).textContent=c.mag!==null?n(c.mag,3):'—';for(const id of ['carPitch','flightPitch'])$(id).textContent=t?n(t.pitch,1)+'° PITCH':'—° PITCH';for(const id of ['carRoll','flightRoll'])$(id).textContent=t?n(t.roll,1)+'° ROLL':'—° ROLL';const ft=c.alt;for(const id of ['carAlt','flightAlt','flightAltLarge'])$(id).textContent=ft===null?'— ft':Math.round(ft).toLocaleString()+' ft';for(const id of ['carAltM','flightAltM','flightAltLargeM'])$(id).textContent=ft===null?'— m':Math.round(ft/3.280839895).toLocaleString()+' m';$('flightAltAccuracy').textContent=c.altAccuracy===null?'GPS vertical accuracy unavailable':'GPS vertical accuracy ±'+Math.round(c.altAccuracy)+' m';$('flightBaroAlt').textContent=c.baroAlt===null?'BARO ALT: unavailable · '+pressureStatus:'BARO ALT: '+Math.round(c.baroAlt).toLocaleString()+' ft ('+Math.round(c.baroAltM).toLocaleString()+' m) · '+n(pressure,1)+' hPa';for(const id of ['carTemp','flightTemp','flightTempLarge'])$(id).textContent=c.temp===null?'— °C':n(c.temp,1)+' °C';for(const id of ['carTempF','flightTempLargeF'])$(id).textContent=c.temp===null?'Ambient sensor unavailable':n(c.temp*9/5+32,1)+' °F';for(const id of ['carHeading','flightHeading','flightCompass'])$(id).textContent=c.heading===null?'—°':Math.round(c.heading)+'°';$('carCardinal').textContent=cardinal(c.heading);$('flightCardinal').textContent=cardinal(c.heading);$('flightSpeed').textContent=c.speed===null?'—':Math.round(c.speed);$('pfdTemp').textContent=c.temp===null?'OAT --.-°C':'OAT '+n(c.temp,1)+'°C';$('pfdQnh').textContent='QNH '+(parseFloat($('qnh').value)||1013.25).toFixed(0);$('pfdHeading').textContent='HDG '+(c.heading===null?'---':String(Math.round(c.heading)).padStart(3,'0')+'°');$('pfdStatus').textContent=zeroSet?'ATT REF SET':'ATT REF NOT SET';$('sensorAvailability').textContent='Compass diag: '+compassDiag+' · Magnetometer API: '+(('Magnetometer'in window)?'yes':'no')+' · Motion: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'linear acceleration active':(gravityFeedSeen?'gravity-inclusive only':'waiting'))+' · Vehicle G: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'fixed mount axes active':'unavailable; linear feed required')+' · Attitude source: '+(orientation?attitudeSource:'waiting')+' · GPS altitude: '+(gps&&Number.isFinite(gps.altitude)?'receiving':'waiting')+' · Barometer API: '+((('Barometer'in window)||('PressureSensor'in window))?'detected':'not exposed')+' · Ambient temperature: '+(('AmbientTemperatureSensor'in window)?'API detected':'not exposed to this webpage')+' · Barometer: '+pressureStatus+' · Compass: '+(heading===null?'waiting ('+headingSource+')':('active via '+headingSource));drawPfd(t,c);drawAllCharts();if(performance.now()-lastUi>500){lastUi=performance.now();$('sampleCount').textContent=log.length.toLocaleString();$('peakG').textContent=log.length?n(peak,3)+' g':'—';$('fileSize').textContent=(csvBytes/1024).toFixed(1)+' KB';$('elapsed').textContent=recording?timeFmt((performance.now()-startTime-pausedMs-(paused?performance.now()-pauseAt:0))/1000):$('elapsed').textContent;const hz=+$('logRate').value,remaining=(MAX_SAMPLES-log.length)/hz;$('capacity').textContent='100,000-sample cap · '+(remaining/3600).toFixed(2)+' h remaining at '+hz+' Hz · CSV size so far '+(csvBytes/1024).toFixed(1)+' KB. Keep the page visible.'}}
+function drawPfd(tilt,c){
+ const cv=$('pfd'),ctx=cv.getContext('2d'),w=cv.width,h=cv.height,cx=w/2,cy=h*.47;
+ const boxW=w*.54,boxH=h*.66,bx=cx-boxW/2,by=cy-boxH/2;
+ ctx.clearRect(0,0,w,h);ctx.fillStyle='#05080e';ctx.fillRect(0,0,w,h);
+ // Clipped, moving blue/brown attitude field.
+ ctx.save();ctx.beginPath();ctx.rect(bx,by,boxW,boxH);ctx.clip();
+ ctx.save();ctx.translate(cx,cy);
+ const pitch=tilt?clamp(tilt.pitch,-45,45):0,roll=tilt?tilt.roll:0;
+ ctx.rotate(-roll*RAD);ctx.translate(0,pitch*5.2);
+ ctx.fillStyle='#176bd0';ctx.fillRect(-w*1.5,-h*2,w*3,h*2);
+ ctx.fillStyle='#b95a0c';ctx.fillRect(-w*1.5,0,w*3,h*2);
+ // Horizon line
+ ctx.strokeStyle='#f7f8fb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-w,0);ctx.lineTo(w,0);ctx.stroke();
+ // Pitch ladder, 2.5 / 5 degree graduations.
+ for(let d=-30;d<=30;d+=2.5){
+   if(d===0)continue;
+   const yy=-d*5.2,major=Math.abs(d%10)<.01,mid=Math.abs(d%5)<.01,half=major?92:(mid?58:28);
+   ctx.strokeStyle='#f4f7fb';ctx.lineWidth=major?3:2;ctx.beginPath();ctx.moveTo(-half,yy);ctx.lineTo(half,yy);ctx.stroke();
+   if(major){ctx.fillStyle='#fff';ctx.font='bold 19px Arial';ctx.textAlign='center';ctx.fillText(String(Math.abs(d)), -half-27, yy+6);ctx.fillText(String(Math.abs(d)),half+27,yy+6)}
+   // Dashed lower half marks the negative pitch ladder.
+   if(d<0&&major){ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(-half-12,yy-9);ctx.lineTo(-half-12,yy+9);ctx.moveTo(half+12,yy-9);ctx.lineTo(half+12,yy+9);ctx.stroke();ctx.setLineDash([])}
+ }
+ ctx.restore();ctx.restore();
+ // Bank scale and a pointer that follows relative roll.
+ const arcY=by+18,arcR=76;
+ ctx.strokeStyle='#e5edf7';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,arcY,arcR,Math.PI,2*Math.PI);ctx.stroke();
+ for(let d=-60;d<=60;d+=10){const a=(d-90)*RAD;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(arcR-7),arcY+Math.sin(a)*(arcR-7));ctx.lineTo(cx+Math.cos(a)*(arcR+5),arcY+Math.sin(a)*(arcR+5));ctx.stroke()}
+ const bankAngle=clamp(roll,-60,60)*RAD-Math.PI/2;
+ const px=cx+Math.cos(bankAngle)*(arcR+10),py=arcY+Math.sin(bankAngle)*(arcR+10);
+ ctx.fillStyle='#ffd34f';ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-9,py-15);ctx.lineTo(px+9,py-15);ctx.closePath();ctx.fill();
+ // Fixed aircraft reference symbol.
+ ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx-125,cy);ctx.lineTo(cx-42,cy);ctx.lineTo(cx-42,cy+19);ctx.moveTo(cx+125,cy);ctx.lineTo(cx+42,cy);ctx.lineTo(cx+42,cy+19);ctx.stroke();
+ ctx.fillStyle='#ffd34f';ctx.fillRect(cx-4,cy-4,8,8);
+ // Left/right tapes: GPS groundspeed and GPS altitude, never labelled IAS.
+ const tapeY=by+46,tapeH=boxH-82,tapeW=132,leftX=18,rightX=w-18-tapeW;
+ ctx.fillStyle='#0b1422';ctx.fillRect(leftX,tapeY,tapeW,tapeH);ctx.fillRect(rightX,tapeY,tapeW,tapeH);
+ ctx.strokeStyle='#8298b2';ctx.lineWidth=2;ctx.strokeRect(leftX,tapeY,tapeW,tapeH);ctx.strokeRect(rightX,tapeY,tapeW,tapeH);
+ ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillStyle='#9bc9ff';ctx.fillText('GS · KTS',leftX+tapeW/2,tapeY+20);ctx.fillStyle='#e7c17b';ctx.fillText('GPS · FT',rightX+tapeW/2,tapeY+20);
+ const tickBase=cy+15,spacing=42;
+ for(let i=-3;i<=3;i++){
+   const yy=tickBase+i*spacing;
+   ctx.strokeStyle='#c5d4e5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(leftX+tapeW-28,yy);ctx.lineTo(leftX+tapeW-8,yy);ctx.moveTo(rightX+8,yy);ctx.lineTo(rightX+28,yy);ctx.stroke();
+   ctx.font='13px Arial';ctx.fillStyle='#e8eff8';
+   if(c.speed!==null){ctx.textAlign='right';ctx.fillText(String(Math.round(c.speed)-i*5),leftX+tapeW-34,yy+5)}
+   if(c.alt!==null){ctx.textAlign='left';ctx.fillText(String(Math.round(c.alt)-i*100),rightX+34,yy+5)}
+ }
+ // Current-value windows.
+ ctx.fillStyle='#142236';ctx.fillRect(leftX-2,cy-15,tapeW+4,38);ctx.fillRect(rightX-2,cy-15,tapeW+4,38);
+ ctx.strokeStyle='#f4f7fb';ctx.lineWidth=2;ctx.strokeRect(leftX-2,cy-15,tapeW+4,38);ctx.strokeRect(rightX-2,cy-15,tapeW+4,38);
+ ctx.font='bold 24px Arial';ctx.textAlign='center';ctx.fillStyle='#fff';
+ ctx.fillText(c.speed===null?'---':String(Math.round(c.speed)),leftX+tapeW/2,cy+11);
+ ctx.fillText(c.alt===null?'-----':String(Math.round(c.alt)),rightX+tapeW/2,cy+11);
+ // Moving heading tape at the bottom, centered on magnetic heading.
+ const tapeTop=h-72,tapeCenter=cx,head=Number.isFinite(c.heading)?c.heading:null;
+ ctx.fillStyle='#0b1422';ctx.fillRect(cx-220,tapeTop,440,54);ctx.strokeStyle='#536a83';ctx.strokeRect(cx-220,tapeTop,440,54);
+ if(head!==null){
+   for(let d=-30;d<=30;d+=5){
+     const x=tapeCenter+d*7.0,deg=(Math.round(head/5)*5+d+3600)%360;
+     ctx.strokeStyle='#b9c9db';ctx.beginPath();ctx.moveTo(x,tapeTop+4);ctx.lineTo(x,tapeTop+(d%10===0?17:11));ctx.stroke();
+     if(d%10===0){ctx.fillStyle='#eaf1f9';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText(String(deg).padStart(3,'0'),x,tapeTop+36)}
+   }
+   ctx.fillStyle='#ffd34f';ctx.beginPath();ctx.moveTo(cx,tapeTop);ctx.lineTo(cx-7,tapeTop-8);ctx.lineTo(cx+7,tapeTop-8);ctx.closePath();ctx.fill();
+ }
+ ctx.fillStyle='#b9d4f2';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(head===null?'HDG ---°':'HDG '+String(Math.round(head)).padStart(3,'0')+'°',cx,h-5);
+ if(!tilt){ctx.fillStyle='#ffcf65';ctx.font='bold 17px Arial';ctx.fillText('SET ATTITUDE REFERENCE',cx,cy+boxH*.38)}
+}
+function spark(id,arr,color,unit=''){
+ const cv=$(id);if(!cv)return;const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2),w=Math.max(180,r.width),h=Math.max(90,r.height);
+ cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+ const left=42,right=8,top=8,bottom=30,pw=w-left-right,ph=h-top-bottom,now=performance.now(),win=(+$('window').value)*1000,vals=arr.filter(p=>now-p.t<=win);
+ const style=getComputedStyle(document.documentElement),muted=style.getPropertyValue('--muted'),line=style.getPropertyValue('--line');
+ x.font='10px Arial';x.fillStyle=muted;x.strokeStyle=line;x.lineWidth=1;
+ if(vals.length<2){x.textAlign='center';x.fillText('Waiting for data',w/2,h/2);return}
+ let min=Math.min(...vals.map(p=>p.v)),max=Math.max(...vals.map(p=>p.v));if(Math.abs(max-min)<.01){max+=.5;min-=.5}
+ const pad=(max-min)*.12;min-=pad;max+=pad;const y=v=>top+(max-v)/(max-min)*ph;
+ x.textAlign='right';x.textBaseline='middle';
+ for(let i=0;i<=4;i++){const v=max-(max-min)*i/4,yy=y(v);x.beginPath();x.moveTo(left,yy);x.lineTo(w-right,yy);x.stroke();x.fillText(v.toFixed(1),left-5,yy)}
+ x.textAlign='center';x.textBaseline='top';
+ for(let i=0;i<=4;i++){const sec=-win/1000+(win/1000)*i,xx=left+pw*i/4;x.beginPath();x.moveTo(xx,top);x.lineTo(xx,top+ph);x.stroke();x.fillText(sec===0?'0':sec.toFixed(0),xx,top+ph+3)}
+ x.fillStyle=muted;x.font='10px Arial';x.fillText('Time (s)',left+pw/2,h-11);
+ x.save();x.translate(10,top+ph/2);x.rotate(-Math.PI/2);x.textAlign='center';x.fillText(unit||'Value',0,0);x.restore();
+ x.strokeStyle=color;x.lineWidth=2;x.beginPath();vals.forEach((p,i)=>{const px=left+(p.t-(now-win))/win*pw,py=y(p.v);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+}
+function drawGPlot(id,series,magnitude=false,yLabel='Acceleration (g)'){
+ const cv=$(id);if(!cv)return;
+ const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2),w=Math.max(180,r.width),h=Math.max(90,r.height);
+ cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+ const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+ const left=42,right=8,top=8,bottom=31,pw=w-left-right,ph=h-top-bottom,now=performance.now(),win=(+$('window').value)*1000;
+ const visible=series.map(([arr,color])=>[arr.filter(p=>now-p.t<=win),color]);
+ const values=visible.flatMap(([arr])=>arr.map(p=>p.v));
+ if(!values.length)return;
+ let min,max,step;
+ if(magnitude){max=Math.max(.5,...values)*1.08;step=max<=2?.5:max<=5?1:max<=10?2:5;max=Math.ceil(max/step)*step;min=0}
+ else{const peak=Math.max(.25,...values.map(Math.abs))*1.08;step=peak<=1?.25:peak<=2?.5:peak<=5?1:peak<=10?2:5;max=Math.ceil(peak/step)*step;min=-max}
+ const y=v=>top+(max-v)/(max-min)*ph;
+ x.font='10px Arial';x.textAlign='right';x.textBaseline='middle';x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');
+ const nTicks=4;
+ for(let i=0;i<=nTicks;i++){const v=max-(max-min)*i/nTicks,yy=y(v);x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--line');x.lineWidth=1;x.beginPath();x.moveTo(left,yy);x.lineTo(w-right,yy);x.stroke();x.fillText(v.toFixed(magnitude?1:2),left-5,yy)}
+ x.textAlign='center';x.textBaseline='top';
+ for(let i=0;i<=4;i++){const sec=-win/1000+(win/1000)*i,xx=left+pw*i/4;x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--line');x.beginPath();x.moveTo(xx,top);x.lineTo(xx,top+ph);x.stroke();x.fillText(sec===0?'0':sec.toFixed(0),xx,top+ph+3)}
+ x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');x.textAlign='center';x.fillText('Time (s)',left+pw/2,h-11);x.save();x.translate(10,top+ph/2);x.rotate(-Math.PI/2);x.fillText(yLabel,0,0);x.restore();
+ for(const [arr,color] of visible){if(arr.length<2)continue;x.strokeStyle=color;x.lineWidth=1.8;x.beginPath();arr.forEach((p,i)=>{const xx=left+(p.t-(now-win))/win*pw,yy=y(p.v);i?x.lineTo(xx,yy):x.moveTo(xx,yy)});x.stroke()}
+}
+function sparkMulti(id,series,unit='°'){
+ const cv=$(id);if(!cv)return;const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2),w=Math.max(180,r.width),h=Math.max(90,r.height);
+ cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+ const left=42,right=8,top=8,bottom=30,pw=w-left-right,ph=h-top-bottom,now=performance.now(),win=(+$('window').value)*1000;
+ const visible=series.map(([arr,color])=>[arr.filter(p=>now-p.t<=win),color]),all=visible.flatMap(([arr])=>arr.map(p=>p.v));
+ const style=getComputedStyle(document.documentElement),muted=style.getPropertyValue('--muted'),line=style.getPropertyValue('--line');
+ if(all.length<2){x.fillStyle=muted;x.textAlign='center';x.font='10px Arial';x.fillText('Waiting for data',w/2,h/2);return}
+ let min=Math.min(...all),max=Math.max(...all);if(max-min<.01){max+=.5;min-=.5}const pad=(max-min)*.12;min-=pad;max+=pad;const y=v=>top+(max-v)/(max-min)*ph;
+ x.font='10px Arial';x.fillStyle=muted;x.strokeStyle=line;x.textAlign='right';x.textBaseline='middle';
+ for(let i=0;i<=4;i++){const v=max-(max-min)*i/4,yy=y(v);x.beginPath();x.moveTo(left,yy);x.lineTo(w-right,yy);x.stroke();x.fillText(v.toFixed(1),left-5,yy)}
+ x.textAlign='center';x.textBaseline='top';
+ for(let i=0;i<=4;i++){const sec=-win/1000+(win/1000)*i,xx=left+pw*i/4;x.beginPath();x.moveTo(xx,top);x.lineTo(xx,top+ph);x.stroke();x.fillText(sec===0?'0':sec.toFixed(0),xx,top+ph+3)}
+ x.fillText('Time (s)',left+pw/2,h-11);x.save();x.translate(10,top+ph/2);x.rotate(-Math.PI/2);x.fillText(unit,0,0);x.restore();
+ for(const [vals,color] of visible){if(vals.length<2)continue;x.strokeStyle=color;x.lineWidth=2;x.beginPath();vals.forEach((p,i)=>{const px=left+(p.t-(now-win))/win*pw,py=y(p.v);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}
+}
+function drawAllCharts(){const css=getComputedStyle(document.documentElement);const c1=css.getPropertyValue('--cyan'),c2=css.getPropertyValue('--green'),c3=css.getPropertyValue('--amber');drawGPlot('flightGChart',[[history.gx,c1],[history.gy,c2],[history.gz,c3]],false,'Vehicle acceleration (g)');drawGPlot('flightMagChart',[[history.mag,c3]],true,'Resultant (g)');sparkMulti('flightTiltChart',[[history.pitch,c1],[history.roll,c2]],'Angle (°)');sparkMulti('flightAltChart',[[history.alt,c1],[history.baroAlt,c3]],'Altitude (ft)');spark('flightTempChart',history.temp,css.getPropertyValue('--red'),'Temperature (°C)');spark('flightCompassChart',history.compass,c1,'Heading (°)')}
+const csvHeader='elapsed_s,longitudinal_g,lateral_g,vertical_g,resultant_g,pitch_deg,roll_deg,gps_alt_ft,gps_alt_m,ambient_temp_C,mag_heading_deg,gps_groundspeed_kt,gps_vertical_accuracy_m,baro_alt_ft,baro_alt_m,pressure_hPa,gps_lat,gps_lon,acceleration_source,phone_x_g,phone_y_g,phone_z_g';
+function startLog(){if(!rawAcc&&!gps&&!orientation){say('No sensor data received yet. Enable motion and/or GPS before logging.',true);return}if(recording)return;log=[];events=[];peak=0;csvBytes=csvHeader.length+1;paused=false;recording=true;pausedMs=0;startTime=performance.now();timer=setInterval(sample,1000/(+$('logRate').value));$('recordBtn').disabled=true;$('pauseBtn').disabled=false;$('stopBtn').disabled=false;$('markBtn').disabled=false;$('exportBtn').disabled=false;$('logState').textContent='Recording';$('stickyLogState').textContent='RECORDING';$('events').textContent='No event markers.';say('Recording started. Stay in the foreground; background tabs may suspend sensors.')}
+function pauseLog(){if(!recording)return;if(!paused){paused=true;pauseAt=performance.now();$('pauseBtn').textContent='Resume';$('logState').textContent='Paused';$('stickyLogState').textContent='PAUSED'}else{pausedMs+=performance.now()-pauseAt;paused=false;$('pauseBtn').textContent='Pause';$('logState').textContent='Recording';$('stickyLogState').textContent='RECORDING'}}
+function stopLog(){if(timer)clearInterval(timer);timer=null;recording=false;paused=false;$('recordBtn').disabled=false;$('pauseBtn').disabled=true;$('stopBtn').disabled=true;$('pauseBtn').textContent='Pause';$('markBtn').disabled=true;$('logState').textContent='Stopped';$('stickyLogState').textContent='STOPPED'}
+function mark(){if(!recording||paused)return;const t=(performance.now()-startTime-pausedMs)/1000;events.push({t,label:'EVENT'});$('events').textContent=events.map(e=>timeFmt(e.t)+' · '+e.label).join('   | ')}
+function exportCsv(){if(!log.length){say('No recorded samples to export.',true);return}const rows=[csvHeader,...log.map(r=>r.map(v=>typeof v==='number'?String(v):v).join(',')),'','event_time_s,event_label',...events.map(e=>e.t+','+e.label)];const blob=new Blob([rows.join('\n')],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='telemetry-log-'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);say('CSV export prepared.')}
+function resetAll(){if(recording)stopLog();log=[];events=[];peak=0;csvBytes=0;Object.keys(history).forEach(k=>history[k]=[]);$('events').textContent='No event markers.';$('elapsed').textContent='00:00';$('sampleCount').textContent='0';$('peakG').textContent='—';$('fileSize').textContent='0 KB';say('Session reset. Session data cleared; attitude and stationary G-bias references are retained. Capture mount & attitude reference again after changing the phone mount.')}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('carView').classList.toggle('active',b.dataset.tab==='car');$('flightView').classList.toggle('active',b.dataset.tab==='flight');requestAnimationFrame(()=>{drawPfd(getAttitude(),current());drawAllCharts()})}));
+$('themeBtn').addEventListener('click',()=>{document.documentElement.classList.toggle('light');try{localStorage.setItem('telemetryTheme',document.documentElement.classList.contains('light')?'light':'dark')}catch(e){}drawAllCharts()});try{if(localStorage.getItem('telemetryTheme')==='light')document.documentElement.classList.add('light')}catch(e){}
+$('enableBtn').addEventListener('click',enableMotion);$('gpsBtn').addEventListener('click',enableGps);$('recordBtn').addEventListener('click',startLog);$('pauseBtn').addEventListener('click',pauseLog);$('stopBtn').addEventListener('click',stopLog);$('markBtn').addEventListener('click',mark);$('exportBtn').addEventListener('click',exportCsv);$('resetBtn').addEventListener('click',resetAll);$('zeroBtn').addEventListener('click',zeroAttitude);$('flightZeroBtn').addEventListener('click',zeroAttitude);$('qnh').addEventListener('input',updateUi);$('window').addEventListener('change',drawAllCharts);
+window.addEventListener('beforeunload',e=>{if(recording){e.preventDefault();e.returnValue=''}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&recording)say('Warning: page is in the background. Mobile browsers may throttle or suspend sensor readings.',true)});
+let renderStamp=0;function renderLoop(ts){if(ts-renderStamp>=1000/60){renderStamp=ts;updateUi()}requestAnimationFrame(renderLoop)}requestAnimationFrame(renderLoop);say('Ready. Enable motion, then enable GPS separately. Pressure and ambient temperature require a browser-exposed sensor API or a native Android bridge.');
+})();
+</script>
+</body>
+</html>
