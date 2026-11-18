@@ -8,7 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#07111e;--panel:#101d2e;--panel2:#17263a;--line:#2a3c54;--fg:#e8f0fb;--muted:#91a5bd;--cyan:#57c7ef;--green:#6bd6a3;--amber:#f3bd65;--red:#ff747d;--blue:#4c9cff}
 :root.light{color-scheme:light;--bg:#edf2f7;--panel:#fff;--panel2:#f1f5fa;--line:#d3deea;--fg:#18283c;--muted:#64758b;--cyan:#087fae;--green:#16865b;--amber:#a86a09;--red:#c63843;--blue:#176dcc}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select{font:inherit}button,select,input{color:var(--fg);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}button{font-weight:650;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#03121d;border-color:transparent}.danger{border-color:#87434b;color:var(--red)}header,main,footer{max-width:1050px;margin:auto;padding-left:14px;padding-right:14px}header{padding-top:17px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}.sub{color:var(--muted);font-size:.78rem}.top-actions,.toolbar,.tabs,.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tabs{padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}.tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:11px}.tabs button.active{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}main{padding-bottom:30px}.view{display:none}.view.active{display:block}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}.panel h2{font-size:.92rem;margin:0 0 10px}.muted{color:var(--muted)}.tiny{font-size:.72rem;color:var(--muted)}.status{margin-left:auto;color:var(--muted);font-size:.78rem}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#74849a;margin-right:5px}.dot.on{background:var(--green)}.toolbar{margin-bottom:8px}.toolbar button{padding:8px 10px}.readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.readout{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;min-width:0}.readout label{display:block;color:var(--muted);font-size:.7rem}.num{font-size:clamp(1.25rem,4vw,1.85rem);font-weight:760;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{font-size:.72rem;color:var(--muted);margin-left:3px}.cyan{color:var(--cyan)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.instrument{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}.instrument-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.instrument-head b{font-size:.82rem}.instrument .big{font-size:1.5rem;font-weight:750;font-variant-numeric:tabular-nums}.instrument canvas{display:block;width:100%;height:76px}.gauge canvas{height:120px}.pfd-wrap{background:#050a12;border:1px solid #29384b;border-radius:14px;padding:8px;overflow:hidden}.pfd-top{display:flex;justify-content:space-between;align-items:center;color:#7bd78d;font:700 .72rem ui-monospace,monospace;padding:0 5px 6px}.pfd{display:block;width:100%;height:auto;aspect-ratio:1.36;background:#05080e;border-radius:8px}.pfd-bottom{display:flex;justify-content:space-between;gap:8px;color:#a8c1dc;font:700 .72rem ui-monospace,monospace;padding:7px 4px 1px}.pfd-readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.pfd-readouts .readout{padding:8px}.pfd-readouts .num{font-size:1.1rem}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 9px}.section-title h2{font-size:1rem;margin:0}.section-title span{font-size:.72rem;color:var(--muted)}.settings{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.settings label{font-size:.78rem;color:var(--muted);display:flex;gap:6px;align-items:center}.settings input{width:90px;padding:7px}.message{min-height:1.2em;color:var(--muted);font-size:.78rem;margin-top:7px}.message.error{color:var(--red)}.event-list{font-size:.76rem;color:var(--muted);max-height:110px;overflow:auto}.scroll-note{text-align:center;color:var(--muted);font-size:.72rem;padding:8px}footer{color:var(--muted);font-size:.72rem;padding-bottom:24px}.hidden{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select{font:inherit}button,select,input{color:var(--fg);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}button{font-weight:650;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#03121d;border-color:transparent}.danger{border-color:#87434b;color:var(--red)}header,main,footer{max-width:1050px;margin:auto;padding-left:14px;padding-right:14px}header{padding-top:17px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}.sub{color:var(--muted);font-size:.78rem}.top-actions,.toolbar,.tabs,.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tabs{padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}.tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:11px}.tabs button.active{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}main{padding-bottom:30px}.view{display:none}.view.active{display:block}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}.panel h2{font-size:.92rem;margin:0 0 10px}.muted{color:var(--muted)}.tiny{font-size:.72rem;color:var(--muted)}.status{margin-left:auto;color:var(--muted);font-size:.78rem}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#74849a;margin-right:5px}.dot.on{background:var(--green)}.toolbar{margin-bottom:8px}.toolbar button{padding:8px 10px}.readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.readout{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;min-width:0}.readout label{display:block;color:var(--muted);font-size:.7rem}.num{font-size:clamp(1.25rem,4vw,1.85rem);font-weight:760;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}.unit{font-size:.72rem;color:var(--muted);margin-left:3px}.cyan{color:var(--cyan)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.instrument{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}.instrument-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.instrument-head b{font-size:.82rem}.instrument .big{font-size:1.5rem;font-weight:750;font-variant-numeric:tabular-nums}.instrument canvas{display:block;width:100%;height:76px}.gauge canvas{height:120px}.pfd-wrap{background:#050a12;border:1px solid #29384b;border-radius:14px;padding:8px;overflow:hidden}.pfd-top{display:flex;justify-content:space-between;align-items:center;color:#7bd78d;font:700 .72rem ui-monospace,monospace;padding:0 5px 6px}.pfd{display:block;width:100%;height:auto;aspect-ratio:900/680;background:#05080e;border-radius:8px}.pfd-bottom{display:flex;justify-content:space-between;gap:8px;color:#a8c1dc;font:700 .72rem ui-monospace,monospace;padding:7px 4px 1px}.pfd-readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.pfd-readouts .readout{padding:8px}.pfd-readouts .num{font-size:1.1rem}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 9px}.section-title h2{font-size:1rem;margin:0}.section-title span{font-size:.72rem;color:var(--muted)}.settings{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.settings label{font-size:.78rem;color:var(--muted);display:flex;gap:6px;align-items:center}.settings input{width:90px;padding:7px}.message{min-height:1.2em;color:var(--muted);font-size:.78rem;margin-top:7px}.message.error{color:var(--red)}.event-list{font-size:.76rem;color:var(--muted);max-height:110px;overflow:auto}.scroll-note{text-align:center;color:var(--muted);font-size:.72rem;padding:8px}footer{color:var(--muted);font-size:.72rem;padding-bottom:24px}.hidden{display:none!important}
 @media(max-width:600px){header{padding-top:12px}.readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.pfd-readouts{grid-template-columns:repeat(2,1fr)}.status{width:100%;margin-left:0}.tabs button{font-size:.85rem}}
 
 /* Dedicated FLIGHT build: one mode, no mode switcher. */
@@ -60,8 +60,7 @@ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
   <div class="panel">
    <div class="section-title"><h2>FLIGHT · PRIMARY FLIGHT DISPLAY</h2><span>PHONE ATTITUDE REFERENCE</span></div>
    <div class="pfd-wrap">
-    <div class="pfd-top"><span id="pfdTemp">OAT --.-°C</span><span>ATTITUDE / GPS GS / GPS ALT</span><span id="pfdQnh">QNH 1013</span></div>
-    <canvas id="pfd" class="pfd" width="900" height="660" aria-label="Boeing-inspired primary flight display"></canvas>
+    <canvas id="pfd" class="pfd" width="900" height="680" aria-label="Boeing-inspired primary flight display"></canvas>
     <div class="pfd-bottom"><span id="pfdHeading">HDG ---°</span><span id="pfdStatus">ATT REF NOT SET</span><span>GPS GROUNDSPEED</span></div>
    </div>
    <div class="pfd-readouts">
@@ -136,7 +135,14 @@ function qMul(a,b){return {w:a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z,x:a.w*b.x+a.x*b.w+a
 function qRotate(q,v){const p={w:0,x:v.x,y:v.y,z:v.z},r=qMul(qMul(q,p),qConj(q));return {x:r.x,y:r.y,z:r.z}}
 function wrap180(a){return ((a+180)%360+360)%360-180}
 function orientationQuaternion(){if(!orientation)return null;return orientation.q||quatFromEuler(orientation.alpha,orientation.beta,orientation.gamma)}
-function relQuaternion(){const q=orientationQuaternion();if(!q)return null;return zeroQ?qMul(qConj(zeroQ),q):q}
+function relQuaternion(){
+ // Mount-tilt removal. q = Rz(alpha)*Rx(beta)*Ry(gamma) maps device -> earth, and the
+ // zero reference is a rotation fixed in the DEVICE frame (the cradle angle), so it must
+ // be removed on the RIGHT: q_rel = q * conj(T0). The old conj(q0)*q applied it on the
+ // earth side, which sandwiched the heading rotation Rz(dAlpha) between two tilts and
+ // leaked heading change into pitch/roll. Here Rz stays leftmost, so gravity (row 2 of
+ // the matrix) is independent of heading.
+ const q=orientationQuaternion();if(!q)return null;return zeroQ?qMul(q,qConj(zeroQ)):q}
 function extractZXY(q){
  // DeviceOrientation's intrinsic Z-X'-Y'' convention is represented by
  // q = qZ(alpha) * qX(beta) * qY(gamma). Extract the relative rotation
@@ -318,7 +324,7 @@ async function enableMotion(){try{if(!isSecureContext)throw Error('Motion sensor
 function enableGps(){if(!navigator.geolocation){say('Geolocation is unavailable in this browser.',true);return}if(gpsWatch!==null)return;gpsWatch=navigator.geolocation.watchPosition(pos=>{const c=pos.coords;gps={speed:Number.isFinite(c.speed)?c.speed:null,altitude:Number.isFinite(c.altitude)?c.altitude:null,altitudeAccuracy:Number.isFinite(c.altitudeAccuracy)?c.altitudeAccuracy:null,lat:c.latitude,lon:c.longitude,accuracy:c.accuracy,time:pos.timestamp}},err=>say('GPS: '+err.message,true),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});$('gpsBtn').textContent='GPS enabled'}
 function zeroAttitude(){
  if(!orientation){say('No orientation reading yet. Enable motion and wait for orientation data.',true);return}
- zeroQ=orientationQuaternion();zeroBeta=orientation.beta;zeroGamma=orientation.gamma;
+ zeroQ=quatFromEuler(0,orientation.beta,orientation.gamma);zeroBeta=orientation.beta;zeroGamma=orientation.gamma;
  zeroBaseline=null;
  let baselineNote='G bias baseline not captured';
  if(rawAccKind==='linear'&&performance.now()-rawAccTime<1000){
@@ -351,80 +357,105 @@ function cardinal(h){if(!Number.isFinite(h))return 'Heading unavailable';return 
 function current(){const a=transformedAcc(),tilt=getAttitude(),alt=gps&&Number.isFinite(gps.altitude)?gps.altitude*3.280839895:null,altM=gps&&Number.isFinite(gps.altitude)?gps.altitude:null,altAccuracy=gps&&Number.isFinite(gps.altitudeAccuracy)?gps.altitudeAccuracy:null,baroAlt=baroFeet(),baroAltM=baroAltitudeM(),mag=a?Math.hypot(a.x,a.y,a.z):null;return {a,tilt,alt,altM,altAccuracy,baroAlt,baroAltM,temp:tempC,heading,speed:gps&&gps.speed!==null?gps.speed*1.943844492:null,mag}}
 function pushHist(key,t,v){if(v===null||!Number.isFinite(v))return;const ar=history[key];ar.push({t,v});while(ar.length&&t-ar[0].t>KEEP_MS)ar.shift()}
 function sample(){const t=performance.now(),c=current();if(recording&&!paused){if(log.length>=MAX_SAMPLES){stopLog();say('Recording stopped at the 100,000-sample safety limit. Export the CSV before resetting.',true);return}const elapsed=(t-startTime-pausedMs)/1000;const row=[elapsed,c.a?.x??'',c.a?.y??'',c.a?.z??'',c.mag??'',c.tilt?.pitch??'',c.tilt?.roll??'',c.alt??'',c.alt===null?'':c.alt/3.280839895,c.temp??'',c.heading??'',c.speed??'',c.altAccuracy??'',c.baroAlt??'',c.baroAltM??'',pressure??'',gps?.lat??'',gps?.lon??'',(rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?'linear':'unavailable'),rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.x/G:'',rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.y/G:'',rawAcc&&rawAccKind==='linear'&&performance.now()-rawAccTime<=1000?rawAcc.z/G:''];log.push(row);csvBytes+=row.join(',').length+1;if(Number.isFinite(c.mag))peak=Math.max(peak,c.mag)}}
-function updateUi(){const now=performance.now(),c=current(),a=c.a,t=c.tilt;if(now-lastHistorySample>=1000/30){lastHistorySample=now;if(c.a){pushHist('gx',now,c.a.x);pushHist('gy',now,c.a.y);pushHist('gz',now,c.a.z);pushHist('mag',now,c.mag)}if(c.tilt){pushHist('pitch',now,c.tilt.pitch);pushHist('roll',now,c.tilt.roll)}pushHist('alt',now,c.alt);pushHist('baroAlt',now,c.baroAlt);pushHist('temp',now,c.temp);pushHist('compass',now,c.heading)}for(const id of ['carX','flightX'])$(id).textContent=a?n(a.x,3):'—';for(const id of ['carY','flightY'])$(id).textContent=a?n(a.y,3):'—';for(const id of ['carZ','flightZ'])$(id).textContent=a?n(a.z,3):'—';for(const id of ['carMag','flightMag'])$(id).textContent=c.mag!==null?n(c.mag,3):'—';for(const id of ['carPitch','flightPitch'])$(id).textContent=t?n(t.pitch,1)+'° PITCH':'—° PITCH';for(const id of ['carRoll','flightRoll'])$(id).textContent=t?n(t.roll,1)+'° ROLL':'—° ROLL';const ft=c.alt;for(const id of ['carAlt','flightAlt','flightAltLarge'])$(id).textContent=ft===null?'— ft':Math.round(ft).toLocaleString()+' ft';for(const id of ['carAltM','flightAltM','flightAltLargeM'])$(id).textContent=ft===null?'— m':Math.round(ft/3.280839895).toLocaleString()+' m';$('flightAltAccuracy').textContent=c.altAccuracy===null?'GPS vertical accuracy unavailable':'GPS vertical accuracy ±'+Math.round(c.altAccuracy)+' m';$('flightBaroAlt').textContent=c.baroAlt===null?'BARO ALT: unavailable · '+pressureStatus:'BARO ALT: '+Math.round(c.baroAlt).toLocaleString()+' ft ('+Math.round(c.baroAltM).toLocaleString()+' m) · '+n(pressure,1)+' hPa';for(const id of ['carTemp','flightTemp','flightTempLarge'])$(id).textContent=c.temp===null?'— °C':n(c.temp,1)+' °C';for(const id of ['carTempF','flightTempLargeF'])$(id).textContent=c.temp===null?'Ambient sensor unavailable':n(c.temp*9/5+32,1)+' °F';for(const id of ['carHeading','flightHeading','flightCompass'])$(id).textContent=c.heading===null?'—°':Math.round(c.heading)+'°';$('carCardinal').textContent=cardinal(c.heading);$('flightCardinal').textContent=cardinal(c.heading);$('flightSpeed').textContent=c.speed===null?'—':Math.round(c.speed);$('pfdTemp').textContent=c.temp===null?'OAT --.-°C':'OAT '+n(c.temp,1)+'°C';$('pfdQnh').textContent='QNH '+(parseFloat($('qnh').value)||1013.25).toFixed(0);$('pfdHeading').textContent='HDG '+(c.heading===null?'---':String(Math.round(c.heading)).padStart(3,'0')+'°');$('pfdStatus').textContent=zeroSet?'ATT REF SET':'ATT REF NOT SET';$('sensorAvailability').textContent='Compass diag: '+compassDiag+' · Magnetometer API: '+(('Magnetometer'in window)?'yes':'no')+' · Motion: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'linear acceleration active':(gravityFeedSeen?'gravity-inclusive only':'waiting'))+' · Vehicle G: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'fixed mount axes active':'unavailable; linear feed required')+' · Attitude source: '+(orientation?attitudeSource:'waiting')+' · GPS altitude: '+(gps&&Number.isFinite(gps.altitude)?'receiving':'waiting')+' · Barometer API: '+((('Barometer'in window)||('PressureSensor'in window))?'detected':'not exposed')+' · Ambient temperature: '+(('AmbientTemperatureSensor'in window)?'API detected':'not exposed to this webpage')+' · Barometer: '+pressureStatus+' · Compass: '+(heading===null?'waiting ('+headingSource+')':('active via '+headingSource));drawPfd(t,c);drawAllCharts();if(performance.now()-lastUi>500){lastUi=performance.now();$('sampleCount').textContent=log.length.toLocaleString();$('peakG').textContent=log.length?n(peak,3)+' g':'—';$('fileSize').textContent=(csvBytes/1024).toFixed(1)+' KB';$('elapsed').textContent=recording?timeFmt((performance.now()-startTime-pausedMs-(paused?performance.now()-pauseAt:0))/1000):$('elapsed').textContent;const hz=+$('logRate').value,remaining=(MAX_SAMPLES-log.length)/hz;$('capacity').textContent='100,000-sample cap · '+(remaining/3600).toFixed(2)+' h remaining at '+hz+' Hz · CSV size so far '+(csvBytes/1024).toFixed(1)+' KB. Keep the page visible.'}}
+function updateUi(){const now=performance.now(),c=current(),a=c.a,t=c.tilt;if(now-lastHistorySample>=1000/30){lastHistorySample=now;if(c.a){pushHist('gx',now,c.a.x);pushHist('gy',now,c.a.y);pushHist('gz',now,c.a.z);pushHist('mag',now,c.mag)}if(c.tilt){pushHist('pitch',now,c.tilt.pitch);pushHist('roll',now,c.tilt.roll)}pushHist('alt',now,c.alt);pushHist('baroAlt',now,c.baroAlt);pushHist('temp',now,c.temp);pushHist('compass',now,c.heading)}for(const id of ['carX','flightX'])$(id).textContent=a?n(a.x,3):'—';for(const id of ['carY','flightY'])$(id).textContent=a?n(a.y,3):'—';for(const id of ['carZ','flightZ'])$(id).textContent=a?n(a.z,3):'—';for(const id of ['carMag','flightMag'])$(id).textContent=c.mag!==null?n(c.mag,3):'—';for(const id of ['carPitch','flightPitch'])$(id).textContent=t?n(t.pitch,1)+'° PITCH':'—° PITCH';for(const id of ['carRoll','flightRoll'])$(id).textContent=t?n(t.roll,1)+'° ROLL':'—° ROLL';const ft=c.alt;for(const id of ['carAlt','flightAlt','flightAltLarge'])$(id).textContent=ft===null?'— ft':Math.round(ft).toLocaleString()+' ft';for(const id of ['carAltM','flightAltM','flightAltLargeM'])$(id).textContent=ft===null?'— m':Math.round(ft/3.280839895).toLocaleString()+' m';$('flightAltAccuracy').textContent=c.altAccuracy===null?'GPS vertical accuracy unavailable':'GPS vertical accuracy ±'+Math.round(c.altAccuracy)+' m';$('flightBaroAlt').textContent=c.baroAlt===null?'BARO ALT: unavailable · '+pressureStatus:'BARO ALT: '+Math.round(c.baroAlt).toLocaleString()+' ft ('+Math.round(c.baroAltM).toLocaleString()+' m) · '+n(pressure,1)+' hPa';for(const id of ['carTemp','flightTemp','flightTempLarge'])$(id).textContent=c.temp===null?'— °C':n(c.temp,1)+' °C';for(const id of ['carTempF','flightTempLargeF'])$(id).textContent=c.temp===null?'Ambient sensor unavailable':n(c.temp*9/5+32,1)+' °F';for(const id of ['carHeading','flightHeading','flightCompass'])$(id).textContent=c.heading===null?'—°':Math.round(c.heading)+'°';$('carCardinal').textContent=cardinal(c.heading);$('flightCardinal').textContent=cardinal(c.heading);$('flightSpeed').textContent=c.speed===null?'—':Math.round(c.speed);$('pfdHeading').textContent='HDG '+(c.heading===null?'---':String(Math.round(c.heading)).padStart(3,'0')+'°');$('pfdStatus').textContent=zeroSet?'ATT REF SET':'ATT REF NOT SET';$('sensorAvailability').textContent='Compass diag: '+compassDiag+' · Magnetometer API: '+(('Magnetometer'in window)?'yes':'no')+' · Motion: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'linear acceleration active':(gravityFeedSeen?'gravity-inclusive only':'waiting'))+' · Vehicle G: '+(rawAccKind==='linear'&&performance.now()-rawAccTime<1000?'fixed mount axes active':'unavailable; linear feed required')+' · Attitude source: '+(orientation?attitudeSource:'waiting')+' · GPS altitude: '+(gps&&Number.isFinite(gps.altitude)?'receiving':'waiting')+' · Barometer API: '+((('Barometer'in window)||('PressureSensor'in window))?'detected':'not exposed')+' · Ambient temperature: '+(('AmbientTemperatureSensor'in window)?'API detected':'not exposed to this webpage')+' · Barometer: '+pressureStatus+' · Compass: '+(heading===null?'waiting ('+headingSource+')':('active via '+headingSource));drawPfd(t,c);drawAllCharts();if(performance.now()-lastUi>500){lastUi=performance.now();$('sampleCount').textContent=log.length.toLocaleString();$('peakG').textContent=log.length?n(peak,3)+' g':'—';$('fileSize').textContent=(csvBytes/1024).toFixed(1)+' KB';$('elapsed').textContent=recording?timeFmt((performance.now()-startTime-pausedMs-(paused?performance.now()-pauseAt:0))/1000):$('elapsed').textContent;const hz=+$('logRate').value,remaining=(MAX_SAMPLES-log.length)/hz;$('capacity').textContent='100,000-sample cap · '+(remaining/3600).toFixed(2)+' h remaining at '+hz+' Hz · CSV size so far '+(csvBytes/1024).toFixed(1)+' KB. Keep the page visible.'}}
+// PFD display smoothing. GPS speed/altitude arrive at roughly 1 Hz, so the tapes are eased toward
+// the latest fix every rendered frame (60 Hz). This changes only what is DRAWN; the CSV log and the
+// numeric readouts keep using the raw sensor values at the user-selected log rate.
+const pfdDisp={speed:null,alt:null,head:null,t:0};
+const PFD_TAU={speed:.30,alt:.30,head:.04};
+function pfdSmooth(c){
+ const now=performance.now(),dt=pfdDisp.t?clamp((now-pfdDisp.t)/1000,.001,.25):1/60;pfdDisp.t=now;
+ const k=tau=>1-Math.exp(-dt/tau);
+ const ease=(cur,tgt,tau)=>tgt===null||!Number.isFinite(tgt)?null:(cur===null?tgt:cur+(tgt-cur)*k(tau));
+ pfdDisp.speed=ease(pfdDisp.speed,c.speed,PFD_TAU.speed);
+ pfdDisp.alt=ease(pfdDisp.alt,c.alt,PFD_TAU.alt);
+ pfdDisp.head=!Number.isFinite(c.heading)?null:(pfdDisp.head===null?c.heading:(((pfdDisp.head+wrap180(c.heading-pfdDisp.head)*k(PFD_TAU.head))%360)+360)%360);
+ return pfdDisp;
+}
 function drawPfd(tilt,c){
  const cv=$('pfd'),ctx=cv.getContext('2d'),w=cv.width,h=cv.height,cx=w/2,cy=h*.47;
  const boxW=w*.54,boxH=h*.66,bx=cx-boxW/2,by=cy-boxH/2;
+ const sm=pfdSmooth(c);
  ctx.clearRect(0,0,w,h);ctx.fillStyle='#05080e';ctx.fillRect(0,0,w,h);
  // Clipped, moving blue/brown attitude field.
+ // 1:1 attitude: roll rotates the horizon by exactly the roll angle; pitch offsets it by
+ // pitch*PPD, the same px/deg used to space the ladder, so a ladder mark of N deg sits N deg
+ // from the horizon. No clamping of pitch or roll.
+ const PPD=5.2;
  ctx.save();ctx.beginPath();ctx.rect(bx,by,boxW,boxH);ctx.clip();
  ctx.save();ctx.translate(cx,cy);
- const pitch=tilt?clamp(tilt.pitch,-90,90):0,roll=tilt?tilt.roll:0;
- ctx.rotate(-roll*RAD);ctx.translate(0,pitch*2.2);
+ const pitch=tilt?tilt.pitch:0,roll=tilt?tilt.roll:0;
+ ctx.rotate(-roll*RAD);ctx.translate(0,pitch*PPD);
  ctx.fillStyle='#176bd0';ctx.fillRect(-w*1.5,-h*2,w*3,h*2);
  ctx.fillStyle='#b95a0c';ctx.fillRect(-w*1.5,0,w*3,h*2);
  // Horizon line
  ctx.strokeStyle='#f7f8fb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-w,0);ctx.lineTo(w,0);ctx.stroke();
- // Pitch ladder, 2.5 / 5 degree graduations.
- for(let d=-90;d<=90;d+=5){
+ // Pitch ladder: 10 deg = long (184 px), 5 deg = half (92 px), 2.5 deg = quarter (46 px).
+ const visR=Math.hypot(boxW,boxH)/2+24;
+ for(let d=-90;d<=90;d+=2.5){
    if(d===0)continue;
-   const yy=-d*2.2,major=Math.abs(d%10)<.01,half=major?92:58;
-   ctx.strokeStyle='#f4f7fb';ctx.lineWidth=major?3:2;
-   ctx.beginPath();ctx.moveTo(-half,yy);ctx.lineTo(half,yy);ctx.stroke();
-   if(major){
-     const label=d>0?'+'+d:'-'+Math.abs(d);
-     ctx.fillStyle='#fff';ctx.font='bold 18px Arial';ctx.textAlign='center';
-     ctx.fillText(label,-half-31,yy+6);ctx.fillText(label,half+31,yy+6);
-   }
-   if(d<0&&major){
-     ctx.setLineDash([8,6]);ctx.beginPath();
-     ctx.moveTo(-half-12,yy-9);ctx.lineTo(-half-12,yy+9);
-     ctx.moveTo(half+12,yy-9);ctx.lineTo(half+12,yy+9);
-     ctx.stroke();ctx.setLineDash([]);
-   }
+   const yy=-d*PPD;
+   if(Math.abs(yy+pitch*PPD)>visR)continue;
+   const major=Math.abs(d%10)<.01,mid=!major&&Math.abs(d%5)<.01,half=major?92:(mid?46:23);
+   ctx.strokeStyle='#f4f7fb';ctx.lineWidth=major?3:2;ctx.beginPath();ctx.moveTo(-half,yy);ctx.lineTo(half,yy);ctx.stroke();
+   if(major){ctx.fillStyle='#fff';ctx.font='bold 19px Arial';ctx.textAlign='center';ctx.fillText(String(Math.abs(d)), -half-27, yy+6);ctx.fillText(String(Math.abs(d)),half+27,yy+6)}
+   // Dashed lower half marks the negative pitch ladder.
+   if(d<0&&major){ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(-half-12,yy-9);ctx.lineTo(-half-12,yy+9);ctx.moveTo(half+12,yy-9);ctx.lineTo(half+12,yy+9);ctx.stroke();ctx.setLineDash([])}
  }
  ctx.restore();ctx.restore();
  // Bank scale and a pointer that follows relative roll.
  const arcY=by+18,arcR=76;
  ctx.strokeStyle='#e5edf7';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,arcY,arcR,Math.PI,2*Math.PI);ctx.stroke();
  for(let d=-60;d<=60;d+=10){const a=(d-90)*RAD;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(arcR-7),arcY+Math.sin(a)*(arcR-7));ctx.lineTo(cx+Math.cos(a)*(arcR+5),arcY+Math.sin(a)*(arcR+5));ctx.stroke()}
- const bankAngle=clamp(roll,-60,60)*RAD-Math.PI/2;
+ const bankAngle=roll*RAD-Math.PI/2;
  const px=cx+Math.cos(bankAngle)*(arcR+10),py=arcY+Math.sin(bankAngle)*(arcR+10);
  ctx.fillStyle='#ffd34f';ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-9,py-15);ctx.lineTo(px+9,py-15);ctx.closePath();ctx.fill();
  // Fixed aircraft reference symbol.
  ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx-125,cy);ctx.lineTo(cx-42,cy);ctx.lineTo(cx-42,cy+19);ctx.moveTo(cx+125,cy);ctx.lineTo(cx+42,cy);ctx.lineTo(cx+42,cy+19);ctx.stroke();
  ctx.fillStyle='#ffd34f';ctx.fillRect(cx-4,cy-4,8,8);
- // Left/right tapes: GPS groundspeed and GPS altitude, never labelled IAS.
+ // Left/right tapes: GPS groundspeed and GPS altitude, never labelled IAS. Both scroll vertically.
  const tapeY=by+46,tapeH=boxH-82,tapeW=132,leftX=18,rightX=w-18-tapeW;
  ctx.fillStyle='#0b1422';ctx.fillRect(leftX,tapeY,tapeW,tapeH);ctx.fillRect(rightX,tapeY,tapeW,tapeH);
  ctx.strokeStyle='#8298b2';ctx.lineWidth=2;ctx.strokeRect(leftX,tapeY,tapeW,tapeH);ctx.strokeRect(rightX,tapeY,tapeW,tapeH);
  ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillStyle='#9bc9ff';ctx.fillText('GS · KTS',leftX+tapeW/2,tapeY+20);ctx.fillStyle='#e7c17b';ctx.fillText('GPS · FT',rightX+tapeW/2,tapeY+20);
- const tickBase=cy+15,spacing=42;
- for(let i=-3;i<=3;i++){
-   const yy=tickBase+i*spacing;
-   ctx.strokeStyle='#c5d4e5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(leftX+tapeW-28,yy);ctx.lineTo(leftX+tapeW-8,yy);ctx.moveTo(rightX+8,yy);ctx.lineTo(rightX+28,yy);ctx.stroke();
-   ctx.font='13px Arial';ctx.fillStyle='#e8eff8';
-   if(c.speed!==null){ctx.textAlign='right';ctx.fillText(String(Math.round(c.speed)-i*5),leftX+tapeW-34,yy+5)}
-   if(c.alt!==null){ctx.textAlign='left';ctx.fillText(String(Math.round(c.alt)-i*100),rightX+34,yy+5)}
- }
+ const scrollTop=tapeY+28,scrollBot=tapeY+tapeH-2,yc=cy+4;      // yc = centre of the value window
+ const PPK=3.2,PPF=0.32;                                         // 10 kt = 32 px, 100 ft = 32 px
+ const vertTape=(val,ppu,tick,labelEvery,x0,dir)=>{
+   // dir=-1: ticks hang off the right edge of the tape (speed); dir=+1: off the left edge (altitude)
+   ctx.save();ctx.beginPath();ctx.rect(x0+1,scrollTop,tapeW-2,scrollBot-scrollTop);ctx.clip();
+   const vLo=val-(scrollBot-yc)/ppu-tick,vHi=val+(yc-scrollTop)/ppu+tick;
+   for(let v=Math.floor(vLo/tick)*tick;v<=vHi;v+=tick){
+     if(dir<0&&v<0)continue;
+     const yy=yc-(v-val)*ppu,lab=v%labelEvery===0,len=lab?20:11;
+     const xe=dir<0?x0+tapeW-8:x0+8;
+     ctx.strokeStyle='#c5d4e5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(xe,yy);ctx.lineTo(xe+dir*len,yy);ctx.stroke();
+     if(lab){ctx.font='13px Arial';ctx.fillStyle='#e8eff8';ctx.textAlign=dir<0?'right':'left';ctx.fillText(String(v),dir<0?x0+tapeW-34:x0+34,yy+5)}
+   }
+   ctx.restore();
+ };
+ if(sm.speed!==null)vertTape(sm.speed,PPK,10,20,leftX,-1);
+ if(sm.alt!==null)vertTape(sm.alt,PPF,100,200,rightX,1);
  // Current-value windows.
  ctx.fillStyle='#142236';ctx.fillRect(leftX-2,cy-15,tapeW+4,38);ctx.fillRect(rightX-2,cy-15,tapeW+4,38);
  ctx.strokeStyle='#f4f7fb';ctx.lineWidth=2;ctx.strokeRect(leftX-2,cy-15,tapeW+4,38);ctx.strokeRect(rightX-2,cy-15,tapeW+4,38);
  ctx.font='bold 24px Arial';ctx.textAlign='center';ctx.fillStyle='#fff';
- ctx.fillText(c.speed===null?'---':String(Math.round(c.speed)),leftX+tapeW/2,cy+11);
- ctx.fillText(c.alt===null?'-----':String(Math.round(c.alt)),rightX+tapeW/2,cy+11);
- // Moving heading tape at the bottom, centered on magnetic heading.
- const tapeTop=h-72,tapeCenter=cx,head=Number.isFinite(c.heading)?c.heading:null;
- ctx.fillStyle='#0b1422';ctx.fillRect(cx-220,tapeTop,440,54);ctx.strokeStyle='#536a83';ctx.strokeRect(cx-220,tapeTop,440,54);
+ ctx.fillText(sm.speed===null?'---':String(Math.round(sm.speed)),leftX+tapeW/2,cy+11);
+ ctx.fillText(sm.alt===null?'-----':String(Math.round(sm.alt)),rightX+tapeW/2,cy+11);
+ // Moving heading tape at the bottom: ticks every 5 deg, labels every 10 deg, slides left as heading increases.
+ const tapeTop=h-72,head=sm.head;
+ ctx.fillStyle='#0b1422';ctx.fillRect(cx-220,tapeTop,440,54);ctx.strokeStyle='#536a83';ctx.lineWidth=1;ctx.strokeRect(cx-220,tapeTop,440,54);
  if(head!==null){
-   for(let d=-30;d<=30;d+=5){
-     const x=tapeCenter+d*7.0,deg=(Math.round(head/5)*5+d+3600)%360;
-     ctx.strokeStyle='#b9c9db';ctx.beginPath();ctx.moveTo(x,tapeTop+4);ctx.lineTo(x,tapeTop+(d%10===0?17:11));ctx.stroke();
-     if(d%10===0){ctx.fillStyle='#eaf1f9';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText(String(deg).padStart(3,'0'),x,tapeTop+36)}
+   const PPDH=7,halfSpan=220/PPDH;
+   ctx.save();ctx.beginPath();ctx.rect(cx-219,tapeTop+1,438,52);ctx.clip();
+   for(let deg=Math.floor((head-halfSpan)/5)*5;deg<=head+halfSpan+5;deg+=5){
+     const x=cx+(deg-head)*PPDH,lab=((deg%360)+360)%360,ten=lab%10===0;
+     ctx.strokeStyle='#b9c9db';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,tapeTop+4);ctx.lineTo(x,tapeTop+(ten?17:11));ctx.stroke();
+     if(ten){ctx.fillStyle='#eaf1f9';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText(String(lab).padStart(3,'0'),x,tapeTop+36)}
    }
+   ctx.restore();
    ctx.fillStyle='#ffd34f';ctx.beginPath();ctx.moveTo(cx,tapeTop);ctx.lineTo(cx-7,tapeTop-8);ctx.lineTo(cx+7,tapeTop-8);ctx.closePath();ctx.fill();
  }
- ctx.fillStyle='#b9d4f2';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(head===null?'HDG ---°':'HDG '+String(Math.round(head)).padStart(3,'0')+'°',cx,h-5);
+ ctx.fillStyle='#b9d4f2';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(head===null?'HDG ---°':'HDG '+String(Math.round(head)%360).padStart(3,'0')+'°',cx,h-5);
  if(!tilt){ctx.fillStyle='#ffcf65';ctx.font='bold 17px Arial';ctx.fillText('SET ATTITUDE REFERENCE',cx,cy+boxH*.38)}
 }
 function spark(id,arr,color,unit=''){
@@ -492,13 +523,7 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()
 $('themeBtn').addEventListener('click',()=>{document.documentElement.classList.toggle('light');try{localStorage.setItem('telemetryTheme',document.documentElement.classList.contains('light')?'light':'dark')}catch(e){}drawAllCharts()});try{if(localStorage.getItem('telemetryTheme')==='light')document.documentElement.classList.add('light')}catch(e){}
 $('enableBtn').addEventListener('click',enableMotion);$('gpsBtn').addEventListener('click',enableGps);$('recordBtn').addEventListener('click',startLog);$('pauseBtn').addEventListener('click',pauseLog);$('stopBtn').addEventListener('click',stopLog);$('markBtn').addEventListener('click',mark);$('exportBtn').addEventListener('click',exportCsv);$('resetBtn').addEventListener('click',resetAll);$('zeroBtn').addEventListener('click',zeroAttitude);$('flightZeroBtn').addEventListener('click',zeroAttitude);$('qnh').addEventListener('input',updateUi);$('window').addEventListener('change',drawAllCharts);
 window.addEventListener('beforeunload',e=>{if(recording){e.preventDefault();e.returnValue=''}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&recording)say('Warning: page is in the background. Mobile browsers may throttle or suspend sensor readings.',true)});
-const DISPLAY_REFRESH_MS=1000/60;
-let renderStamp=0;
-function renderLoop(ts){
- if(ts-renderStamp>=DISPLAY_REFRESH_MS){renderStamp=ts;updateUi()}
- requestAnimationFrame(renderLoop);
-}
-requestAnimationFrame(renderLoop);say('Ready. Enable motion, then enable GPS separately. Pressure and ambient temperature require a browser-exposed sensor API or a native Android bridge.');
+let renderStamp=0;function renderLoop(ts){if(ts-renderStamp>=1000/60){renderStamp=ts;updateUi()}requestAnimationFrame(renderLoop)}requestAnimationFrame(renderLoop);say('Ready. Enable motion, then enable GPS separately. Pressure and ambient temperature require a browser-exposed sensor API or a native Android bridge.');
 })();
 </script>
 </body>
